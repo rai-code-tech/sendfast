@@ -1,0 +1,116 @@
+@import "tailwindcss";
+@import "tailwindcss/theme" layer(theme);
+@import "tailwindcss/utilities" layer(utilities);
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --radius: 0.5rem;
+  --color-background: hsl(240 10% 3.9%);
+  --color-foreground: hsl(0 0% 98%);
+  --color-card: hsl(240 10% 5.5%);
+  --color-card-foreground: hsl(0 0% 98%);
+  --color-popover: hsl(240 10% 5.5%);
+  --color-popover-foreground: hsl(0 0% 98%);
+  --color-primary: hsl(160 84% 39%);
+  --color-primary-foreground: hsl(0 0% 98%);
+  --color-secondary: hsl(240 5% 15%);
+  --color-secondary-foreground: hsl(0 0% 98%);
+  --color-muted: hsl(240 5% 15%);
+  --color-muted-foreground: hsl(240 5% 64.9%);
+  --color-accent: hsl(240 5% 15%);
+  --color-accent-foreground: hsl(0 0% 98%);
+  --color-destructive: hsl(0 62.8% 50.6%);
+  --color-destructive-foreground: hsl(0 0% 98%);
+  --color-border: hsl(240 5% 17%);
+  --color-input: hsl(240 5% 17%);
+  --color-ring: hsl(160 84% 39%);
+}
+
+/*
+  Legacy CSS variable support for shadcn/ui components that
+  use hsl(var(--variable)) pattern.
+*/
+:root {
+  --background: 240 10% 3.9%;
+  --foreground: 0 0% 98%;
+  --card: 240 10% 5.5%;
+  --card-foreground: 0 0% 98%;
+  --popover: 240 10% 5.5%;
+  --popover-foreground: 0 0% 98%;
+  --primary: 160 84% 39%;
+  --primary-foreground: 0 0% 98%;
+  --secondary: 240 5% 15%;
+  --secondary-foreground: 0 0% 98%;
+  --muted: 240 5% 15%;
+  --muted-foreground: 240 5% 64.9%;
+  --accent: 240 5% 15%;
+  --accent-foreground: 0 0% 98%;
+  --destructive: 0 62.8% 50.6%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 240 5% 17%;
+  --input: 240 5% 17%;
+  --ring: 160 84% 39%;
+  --radius: 0.5rem;
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+  }
+}
+
+/* Custom utility classes */
+.gradient-primary {
+  background-image: linear-gradient(to right, #10b981, #14b8a6);
+}
+
+.gradient-primary-hover {
+  background-image: linear-gradient(to right, #059669, #0d9488);
+}
+
+.gradient-text {
+  background-image: linear-gradient(to right, #34d399, #2dd4bf);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.gradient-border {
+  border: 1px solid transparent;
+  background-clip: padding-box;
+  background-image: linear-gradient(hsl(240 10% 5.5%), hsl(240 10% 5.5%)),
+    linear-gradient(to right, #10b981, #14b8a6);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+}
+
+.glass {
+  background-color: rgba(24, 24, 27, 0.8);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-bottom: 1px solid rgba(63, 63, 70, 0.5);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(240 5% 25%);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(240 5% 35%);
+}
