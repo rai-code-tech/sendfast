@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useSession } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -44,13 +44,7 @@ export default function DashboardPage() {
     }
   }, [isPending, session, router]);
 
-  useEffect(() => {
-    if (session) {
-      fetchTransfers();
-    }
-  }, [session]);
-
-  const fetchTransfers = async () => {
+  const fetchTransfers = useCallback(async () => {
     try {
       const response = await fetch("/api/transfers");
       if (response.ok) {
@@ -66,7 +60,13 @@ export default function DashboardPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
+
+  useEffect(() => {
+    if (session) {
+      fetchTransfers();
+    }
+  }, [session, fetchTransfers]);
 
   const deleteTransfer = async (id: string) => {
     setDeleting(id);

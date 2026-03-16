@@ -7,6 +7,9 @@ import {
   BarChart3,
   Check,
   ArrowRight,
+  Globe,
+  Users,
+  FileUp,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -144,6 +147,42 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Trust Bar */}
+      <section className="border-y border-zinc-800 bg-zinc-900/30 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            <div>
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <Shield className="h-5 w-5 text-emerald-400" />
+                <span className="text-2xl font-bold text-white">AES-256</span>
+              </div>
+              <p className="text-sm text-zinc-500">Military-grade encryption</p>
+            </div>
+            <div>
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <Globe className="h-5 w-5 text-emerald-400" />
+                <span className="text-2xl font-bold text-white">150+</span>
+              </div>
+              <p className="text-sm text-zinc-500">Countries served</p>
+            </div>
+            <div>
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <FileUp className="h-5 w-5 text-emerald-400" />
+                <span className="text-2xl font-bold text-white">10M+</span>
+              </div>
+              <p className="text-sm text-zinc-500">Files transferred</p>
+            </div>
+            <div>
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <Users className="h-5 w-5 text-emerald-400" />
+                <span className="text-2xl font-bold text-white">99.9%</span>
+              </div>
+              <p className="text-sm text-zinc-500">Uptime SLA</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Features Section */}
       <section id="features" className="py-24 md:py-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -172,6 +211,48 @@ export default function HomePage() {
                 <p className="text-zinc-400 text-sm leading-relaxed">
                   {feature.description}
                 </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works */}
+      <section className="py-24 md:py-32 border-t border-zinc-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+              How it <span className="gradient-text">works</span>
+            </h2>
+            <p className="text-zinc-400 text-lg max-w-2xl mx-auto">
+              Three simple steps. Your files never leave your browser unencrypted.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+            {[
+              {
+                step: "01",
+                title: "Select your files",
+                desc: "Drag and drop or browse to select any files. No size limits on paid plans.",
+              },
+              {
+                step: "02",
+                title: "Encrypted in-browser",
+                desc: "AES-256-GCM encryption happens locally. Your key never touches our servers.",
+              },
+              {
+                step: "03",
+                title: "Share the link",
+                desc: "Get a secure link with the decryption key embedded. Only your recipient can decrypt.",
+              },
+            ].map((item) => (
+              <div key={item.step} className="text-center">
+                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full gradient-primary text-white font-bold text-lg mb-4">
+                  {item.step}
+                </div>
+                <h3 className="text-lg font-semibold text-white mb-2">{item.title}</h3>
+                <p className="text-zinc-400 text-sm leading-relaxed">{item.desc}</p>
               </div>
             ))}
           </div>
@@ -252,6 +333,39 @@ export default function HomePage() {
                 </Link>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA */}
+      <section className="py-24 md:py-32">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="relative rounded-2xl border border-zinc-800 bg-zinc-900/50 p-12 md:p-16 text-center overflow-hidden">
+            <div className="absolute inset-0 -z-10">
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-emerald-500/5 rounded-full blur-3xl" />
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+              Ready to send files <span className="gradient-text">securely</span>?
+            </h2>
+            <p className="text-zinc-400 text-lg max-w-xl mx-auto mb-8">
+              No account needed. No software to install. Just drag, drop, and share.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link href="/#hero">
+                <Button className="h-12 px-8 gradient-primary hover:opacity-90 text-white border-0 text-base font-semibold">
+                  Start Sending Free
+                  <ArrowRight className="h-5 w-5 ml-2" />
+                </Button>
+              </Link>
+              <Link href="/pricing">
+                <Button
+                  variant="outline"
+                  className="h-12 px-8 border-zinc-700 text-zinc-300 hover:bg-zinc-800 text-base"
+                >
+                  View Plans
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </section>

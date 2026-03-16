@@ -22,6 +22,21 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Map plan names to actual Stripe price IDs
+    const stripePriceId =
+      priceId === "starter"
+        ? process.env.STRIPE_STARTER_PRICE_ID
+        : priceId === "pro"
+          ? process.env.STRIPE_PRO_PRICE_ID
+          : priceId;
+
+    if (!stripePriceId) {
+      return NextResponse.json(
+        { error: "Invalid plan selected" },
+        { status: 400 }
+      );
+    }
+
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
     const checkoutSession = await stripe.checkout.sessions.create({
@@ -29,7 +44,7 @@ export async function POST(req: NextRequest) {
       payment_method_types: ["card"],
       line_items: [
         {
-          price: priceId,
+          price: stripePriceId,
           quantity: 1,
         },
       ],

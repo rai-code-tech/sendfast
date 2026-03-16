@@ -59,17 +59,20 @@ export async function GET(
       const password = req.nextUrl.searchParams.get("password");
 
       if (!password) {
-        return NextResponse.json({
-          id: transfer.id,
-          title: transfer.title,
-          message: transfer.message,
-          expiresAt: transfer.expiresAt,
-          createdAt: transfer.createdAt,
-          downloadCount: transfer._count.downloads,
-          passwordProtected: true,
-          needsPassword: true,
-          files: filesMeta,
-        });
+        return NextResponse.json(
+          {
+            id: transfer.id,
+            title: transfer.title,
+            message: transfer.message,
+            expiresAt: transfer.expiresAt,
+            createdAt: transfer.createdAt,
+            downloadCount: transfer._count.downloads,
+            passwordProtected: true,
+            needsPassword: true,
+            files: filesMeta,
+          },
+          { status: 401 }
+        );
       }
 
       const isValid = await bcrypt.compare(password, transfer.password);

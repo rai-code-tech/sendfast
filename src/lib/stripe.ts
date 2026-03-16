@@ -26,7 +26,7 @@ export const PLANS = {
     maxExpiry: "30d",
     emailDelivery: true,
     tracking: true,
-    passwordProtection: false,
+    passwordProtection: true,
     customBranding: false,
     maxRecipients: 10,
   },
