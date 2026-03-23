@@ -14,6 +14,7 @@ import {
   Zap,
   Shield,
   CheckCircle2,
+  ArrowRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -146,8 +147,8 @@ export default function TransferPage() {
   // Loading state
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center space-y-4">
+      <div className="min-h-screen flex items-center justify-center bg-noise">
+        <div className="text-center space-y-4 animate-fade-in">
           <Loader2 className="h-10 w-10 animate-spin text-emerald-400 mx-auto" />
           <p className="text-zinc-400">Loading transfer...</p>
         </div>
@@ -158,8 +159,11 @@ export default function TransferPage() {
   // Error state (expired / not found)
   if (error && !needsPassword && !transfer) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="max-w-md w-full text-center space-y-6">
+      <div className="min-h-screen flex items-center justify-center p-4 bg-noise">
+        <div className="absolute inset-0 -z-10 bg-radial-top">
+          <div className="bg-grid absolute inset-0" />
+        </div>
+        <div className="max-w-md w-full text-center space-y-6 animate-fade-in-up">
           <div className="mx-auto w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center">
             <AlertTriangle className="h-8 w-8 text-red-400" />
           </div>
@@ -170,8 +174,9 @@ export default function TransferPage() {
             </p>
           </div>
           <Link href="/">
-            <Button className="gradient-primary text-white border-0">
+            <Button className="gradient-primary text-white border-0 shadow-lg shadow-emerald-500/15">
               Send your own files
+              <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
           </Link>
         </div>
@@ -182,9 +187,12 @@ export default function TransferPage() {
   // Password gate
   if (needsPassword) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="max-w-md w-full">
-          <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-8 space-y-6">
+      <div className="min-h-screen flex items-center justify-center p-4 bg-noise">
+        <div className="absolute inset-0 -z-10 bg-radial-top">
+          <div className="bg-grid absolute inset-0" />
+        </div>
+        <div className="max-w-md w-full animate-fade-in-up">
+          <div className="rounded-2xl border border-zinc-800/60 bg-zinc-900/40 backdrop-blur-sm p-8 space-y-6 hover-glow">
             <div className="text-center">
               <div className="mx-auto w-14 h-14 rounded-full bg-amber-500/10 flex items-center justify-center mb-4">
                 <Lock className="h-7 w-7 text-amber-400" />
@@ -200,22 +208,22 @@ export default function TransferPage() {
 
             <form onSubmit={handlePasswordSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label className="text-zinc-400">Password</Label>
+                <Label className="text-zinc-400 text-xs font-medium">Password</Label>
                 <Input
                   type="password"
                   placeholder="Enter password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="bg-zinc-800/50 border-zinc-700"
+                  className="bg-zinc-800/40 border-zinc-700/60 hover:border-zinc-600 transition-colors"
                   autoFocus
                 />
                 {error && (
-                  <p className="text-sm text-red-400">{error}</p>
+                  <p className="text-sm text-red-400 bg-red-500/10 py-1.5 px-3 rounded-lg">{error}</p>
                 )}
               </div>
               <Button
                 type="submit"
-                className="w-full gradient-primary text-white border-0"
+                className="w-full gradient-primary text-white border-0 shadow-lg shadow-emerald-500/15"
               >
                 Unlock Files
               </Button>
@@ -231,12 +239,17 @@ export default function TransferPage() {
   const totalSize = transfer.files.reduce((sum, f) => sum + f.size, 0);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-noise">
+      {/* Background */}
+      <div className="absolute inset-0 -z-10 bg-radial-top">
+        <div className="bg-grid absolute inset-0" />
+      </div>
+
       {/* Minimal nav */}
-      <nav className="border-b border-zinc-800 py-4">
+      <nav className="border-b border-zinc-800/60 py-4 glass">
         <div className="max-w-4xl mx-auto px-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="gradient-primary rounded-lg p-1.5">
+          <Link href="/" className="flex items-center gap-2 group">
+            <div className="gradient-primary rounded-lg p-1.5 shadow-lg shadow-emerald-500/10">
               <Zap className="h-4 w-4 text-white" />
             </div>
             <span className="text-lg font-bold text-white">
@@ -250,22 +263,22 @@ export default function TransferPage() {
         </div>
       </nav>
 
-      <div className="max-w-2xl mx-auto px-4 py-12 md:py-20">
-        <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 overflow-hidden">
+      <div className="max-w-2xl mx-auto px-4 py-12 md:py-20 animate-fade-in-up">
+        <div className="rounded-2xl border border-zinc-800/60 bg-zinc-900/40 backdrop-blur-sm overflow-hidden hover-glow">
           {/* Header */}
-          <div className="p-6 md:p-8 border-b border-zinc-800">
+          <div className="p-6 md:p-8 border-b border-zinc-800/60">
             <div className="flex items-start justify-between mb-4">
               <div>
                 <h1 className="text-2xl font-bold text-white mb-1">
                   {transfer.title || "File Transfer"}
                 </h1>
                 {transfer.message && (
-                  <p className="text-zinc-400 text-sm mt-2">
+                  <p className="text-zinc-400 text-sm mt-2 leading-relaxed">
                     {transfer.message}
                   </p>
                 )}
               </div>
-              <div className="flex items-center gap-1.5 text-xs text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full">
+              <div className="flex items-center gap-1.5 text-xs text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full font-medium">
                 <CheckCircle2 className="h-3.5 w-3.5" />
                 Ready
               </div>
@@ -293,15 +306,17 @@ export default function TransferPage() {
           </div>
 
           {/* File List */}
-          <div className="divide-y divide-zinc-800">
+          <div className="divide-y divide-zinc-800/40">
             {transfer.files.map((file) => (
               <div
                 key={file.id}
-                className="flex items-center gap-3 p-4 md:px-8 hover:bg-zinc-800/30 transition-colors"
+                className="flex items-center gap-3 p-4 md:px-8 hover:bg-zinc-800/20 transition-colors group"
               >
-                <FileIcon className="h-5 w-5 text-emerald-400 shrink-0" />
+                <div className="w-9 h-9 rounded-lg bg-emerald-500/10 flex items-center justify-center shrink-0">
+                  <FileIcon className="h-4 w-4 text-emerald-400" />
+                </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm text-zinc-200 truncate">{file.name}</p>
+                  <p className="text-sm text-zinc-200 truncate font-medium">{file.name}</p>
                   <p className="text-xs text-zinc-500">
                     {formatBytes(file.size)}
                   </p>
@@ -311,7 +326,7 @@ export default function TransferPage() {
                   variant="ghost"
                   onClick={() => downloadFile(file)}
                   disabled={downloading === file.id}
-                  className="text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10"
+                  className="text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 opacity-70 group-hover:opacity-100 transition-all"
                 >
                   {downloading === file.id ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -324,16 +339,16 @@ export default function TransferPage() {
           </div>
 
           {/* Download All */}
-          <div className="p-6 md:p-8 border-t border-zinc-800">
+          <div className="p-6 md:p-8 border-t border-zinc-800/60">
             {error && (
-              <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-sm text-red-400">
+              <div className="mb-4 p-3.5 rounded-xl bg-red-500/10 border border-red-500/20 text-sm text-red-400">
                 {error}
               </div>
             )}
             <Button
               onClick={downloadAllFiles}
               disabled={downloadingAll}
-              className="w-full h-12 gradient-primary hover:opacity-90 text-white border-0 font-semibold"
+              className="w-full h-12 gradient-primary hover:opacity-90 text-white border-0 font-semibold shadow-lg shadow-emerald-500/15"
             >
               {downloadingAll ? (
                 <>
@@ -350,9 +365,10 @@ export default function TransferPage() {
           </div>
         </div>
 
-        <p className="text-center text-xs text-zinc-600 mt-6">
+        <div className="flex items-center justify-center gap-1.5 text-xs text-zinc-600 mt-6">
+          <Shield className="h-3.5 w-3.5 text-emerald-500/50" />
           Files are decrypted in your browser. The server never sees your data.
-        </p>
+        </div>
       </div>
     </div>
   );

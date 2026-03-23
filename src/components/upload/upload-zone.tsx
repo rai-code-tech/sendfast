@@ -14,6 +14,8 @@ import {
   Link2,
   MessageSquare,
   Type,
+  Shield,
+  Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -178,9 +180,9 @@ export function UploadZone() {
   // Success state
   if (result) {
     return (
-      <div className="w-full max-w-2xl mx-auto">
-        <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-8 text-center space-y-6">
-          <div className="mx-auto w-16 h-16 rounded-full gradient-primary flex items-center justify-center">
+      <div className="w-full max-w-2xl mx-auto animate-scale-in">
+        <div className="rounded-2xl border border-emerald-500/20 bg-zinc-900/60 backdrop-blur-sm p-8 text-center space-y-6">
+          <div className="mx-auto w-16 h-16 rounded-full gradient-primary flex items-center justify-center shadow-lg shadow-emerald-500/20">
             <Check className="h-8 w-8 text-white" />
           </div>
           <div>
@@ -193,7 +195,7 @@ export function UploadZone() {
             </p>
           </div>
 
-          <div className="flex items-center gap-2 p-3 rounded-lg bg-zinc-800/50 border border-zinc-700">
+          <div className="flex items-center gap-2 p-3.5 rounded-xl bg-zinc-800/60 border border-zinc-700/50">
             <Link2 className="h-4 w-4 text-emerald-400 shrink-0" />
             <code className="text-sm text-zinc-300 truncate flex-1 text-left">
               {shareUrl}
@@ -201,11 +203,11 @@ export function UploadZone() {
             <Button
               size="sm"
               onClick={copyLink}
-              className={
+              className={`shrink-0 transition-all ${
                 copied
                   ? "bg-emerald-600 hover:bg-emerald-600 text-white"
-                  : "gradient-primary text-white border-0"
-              }
+                  : "gradient-primary text-white border-0 shadow-md shadow-emerald-500/10"
+              }`}
             >
               {copied ? (
                 <>
@@ -219,11 +221,17 @@ export function UploadZone() {
             </Button>
           </div>
 
+          <div className="flex items-center justify-center gap-1.5 text-xs text-zinc-500">
+            <Shield className="h-3.5 w-3.5 text-emerald-500/50" />
+            Encryption key embedded in URL fragment — never sent to server
+          </div>
+
           <Button
             variant="outline"
             onClick={resetUpload}
             className="border-zinc-700 text-zinc-300 hover:bg-zinc-800"
           >
+            <Sparkles className="h-4 w-4 mr-2" />
             Send another file
           </Button>
         </div>
@@ -239,10 +247,10 @@ export function UploadZone() {
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         onClick={() => fileInputRef.current?.click()}
-        className={`relative cursor-pointer rounded-2xl border-2 border-dashed transition-all duration-200 p-8 md:p-12 text-center group ${
+        className={`relative cursor-pointer rounded-2xl border-2 border-dashed transition-all duration-300 p-8 md:p-14 text-center group ${
           dragOver
-            ? "border-emerald-500 bg-emerald-500/5"
-            : "border-zinc-700 hover:border-zinc-500 bg-zinc-900/30 hover:bg-zinc-900/50"
+            ? "border-emerald-400 bg-emerald-500/[0.08] shadow-[0_0_60px_-15px_rgba(16,185,129,0.15)]"
+            : "border-zinc-700/60 hover:border-zinc-500/60 bg-zinc-900/30 hover:bg-zinc-900/50"
         }`}
       >
         <input
@@ -254,15 +262,15 @@ export function UploadZone() {
         />
         <div className="space-y-4">
           <div
-            className={`mx-auto w-14 h-14 rounded-xl flex items-center justify-center transition-colors ${
+            className={`mx-auto w-16 h-16 rounded-2xl flex items-center justify-center transition-all duration-300 ${
               dragOver
-                ? "gradient-primary"
-                : "bg-zinc-800 group-hover:bg-zinc-700"
+                ? "gradient-primary shadow-lg shadow-emerald-500/20 scale-110"
+                : "bg-zinc-800/80 group-hover:bg-zinc-700/80 group-hover:scale-105"
             }`}
           >
             <Upload
-              className={`h-7 w-7 ${
-                dragOver ? "text-white" : "text-zinc-400"
+              className={`h-7 w-7 transition-colors ${
+                dragOver ? "text-white" : "text-zinc-400 group-hover:text-zinc-300"
               }`}
             />
           </div>
@@ -271,32 +279,38 @@ export function UploadZone() {
               Drop files here or{" "}
               <span className="gradient-text font-semibold">browse</span>
             </p>
-            <p className="text-sm text-zinc-500 mt-1">
+            <p className="text-sm text-zinc-500 mt-1.5">
               Files are encrypted in your browser before upload
             </p>
+          </div>
+          <div className="flex items-center justify-center gap-1.5 text-xs text-zinc-600">
+            <Shield className="h-3 w-3 text-emerald-500/50" />
+            AES-256-GCM &middot; Zero-knowledge
           </div>
         </div>
       </div>
 
       {/* Selected Files */}
       {files.length > 0 && (
-        <div className="space-y-4">
-          <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 divide-y divide-zinc-800">
+        <div className="space-y-4 animate-fade-in-up">
+          <div className="rounded-xl border border-zinc-800/60 bg-zinc-900/40 backdrop-blur-sm divide-y divide-zinc-800/60 overflow-hidden">
             {files.map((file, index) => (
               <div
                 key={`${file.name}-${index}`}
-                className="flex items-center gap-3 p-3"
+                className="flex items-center gap-3 p-3.5 hover:bg-zinc-800/30 transition-colors"
               >
-                <FileIcon className="h-5 w-5 text-emerald-400 shrink-0" />
+                <div className="w-9 h-9 rounded-lg bg-emerald-500/10 flex items-center justify-center shrink-0">
+                  <FileIcon className="h-4 w-4 text-emerald-400" />
+                </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm text-zinc-200 truncate">{file.name}</p>
+                  <p className="text-sm text-zinc-200 truncate font-medium">{file.name}</p>
                   <p className="text-xs text-zinc-500">
                     {formatBytes(file.size)}
                   </p>
                 </div>
                 <button
-                  onClick={() => removeFile(index)}
-                  className="text-zinc-500 hover:text-zinc-300 transition-colors"
+                  onClick={(e) => { e.stopPropagation(); removeFile(index); }}
+                  className="text-zinc-500 hover:text-zinc-300 transition-colors p-1 rounded-md hover:bg-zinc-800"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -307,24 +321,24 @@ export function UploadZone() {
           {/* Options Toggle */}
           <button
             onClick={() => setShowOptions(!showOptions)}
-            className="text-sm text-zinc-400 hover:text-zinc-300 transition-colors flex items-center gap-1"
+            className="text-sm text-zinc-400 hover:text-zinc-300 transition-colors flex items-center gap-1.5 group"
           >
-            {showOptions ? "Hide options" : "More options"}
+            <span>{showOptions ? "Hide options" : "More options"}</span>
             <ChevronIcon open={showOptions} />
           </button>
 
           {/* Options Panel */}
           {showOptions && (
-            <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-4 space-y-4">
+            <div className="rounded-xl border border-zinc-800/60 bg-zinc-900/40 backdrop-blur-sm p-5 space-y-4 animate-fade-in-up">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Expiry */}
                 <div className="space-y-2">
-                  <Label className="text-zinc-400 flex items-center gap-1.5">
+                  <Label className="text-zinc-400 flex items-center gap-1.5 text-xs font-medium">
                     <Clock className="h-3.5 w-3.5" />
                     Expires after
                   </Label>
                   <Select value={expiry} onValueChange={setExpiry}>
-                    <SelectTrigger className="bg-zinc-800/50 border-zinc-700">
+                    <SelectTrigger className="bg-zinc-800/50 border-zinc-700/60 hover:border-zinc-600 transition-colors">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -339,7 +353,7 @@ export function UploadZone() {
 
                 {/* Password */}
                 <div className="space-y-2">
-                  <Label className="text-zinc-400 flex items-center gap-1.5">
+                  <Label className="text-zinc-400 flex items-center gap-1.5 text-xs font-medium">
                     <Lock className="h-3.5 w-3.5" />
                     Password (optional)
                   </Label>
@@ -348,14 +362,14 @@ export function UploadZone() {
                     placeholder="Enter password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="bg-zinc-800/50 border-zinc-700"
+                    className="bg-zinc-800/50 border-zinc-700/60 hover:border-zinc-600 transition-colors"
                   />
                 </div>
               </div>
 
               {/* Title */}
               <div className="space-y-2">
-                <Label className="text-zinc-400 flex items-center gap-1.5">
+                <Label className="text-zinc-400 flex items-center gap-1.5 text-xs font-medium">
                   <Type className="h-3.5 w-3.5" />
                   Title (optional)
                 </Label>
@@ -363,13 +377,13 @@ export function UploadZone() {
                   placeholder="Transfer title"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className="bg-zinc-800/50 border-zinc-700"
+                  className="bg-zinc-800/50 border-zinc-700/60 hover:border-zinc-600 transition-colors"
                 />
               </div>
 
               {/* Message */}
               <div className="space-y-2">
-                <Label className="text-zinc-400 flex items-center gap-1.5">
+                <Label className="text-zinc-400 flex items-center gap-1.5 text-xs font-medium">
                   <MessageSquare className="h-3.5 w-3.5" />
                   Message (optional)
                 </Label>
@@ -378,13 +392,13 @@ export function UploadZone() {
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   rows={2}
-                  className="flex w-full rounded-md border border-zinc-700 bg-zinc-800/50 px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  className="flex w-full rounded-md border border-zinc-700/60 bg-zinc-800/50 px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 hover:border-zinc-600 transition-colors"
                 />
               </div>
 
               {/* Recipient Emails */}
               <div className="space-y-2">
-                <Label className="text-zinc-400 flex items-center gap-1.5">
+                <Label className="text-zinc-400 flex items-center gap-1.5 text-xs font-medium">
                   <Mail className="h-3.5 w-3.5" />
                   Email recipients (optional)
                 </Label>
@@ -392,9 +406,9 @@ export function UploadZone() {
                   placeholder="email@example.com, another@example.com"
                   value={emails}
                   onChange={(e) => setEmails(e.target.value)}
-                  className="bg-zinc-800/50 border-zinc-700"
+                  className="bg-zinc-800/50 border-zinc-700/60 hover:border-zinc-600 transition-colors"
                 />
-                <p className="text-xs text-zinc-500">
+                <p className="text-xs text-zinc-600">
                   Comma-separated emails to notify when upload is ready
                 </p>
               </div>
@@ -403,10 +417,13 @@ export function UploadZone() {
 
           {/* Upload Progress */}
           {uploading && (
-            <div className="space-y-2">
+            <div className="space-y-3 p-4 rounded-xl bg-zinc-900/40 border border-zinc-800/60">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-zinc-400">Encrypting &amp; uploading...</span>
-                <span className="text-emerald-400 font-medium">{progress}%</span>
+                <span className="text-zinc-400 flex items-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin text-emerald-400" />
+                  Encrypting &amp; uploading...
+                </span>
+                <span className="text-emerald-400 font-semibold tabular-nums">{progress}%</span>
               </div>
               <Progress value={progress} className="h-2" />
             </div>
@@ -416,7 +433,7 @@ export function UploadZone() {
           <Button
             onClick={handleUpload}
             disabled={uploading || files.length === 0}
-            className="w-full h-12 gradient-primary hover:opacity-90 text-white border-0 text-base font-semibold"
+            className="w-full h-12 gradient-primary hover:opacity-90 text-white border-0 text-base font-semibold shadow-lg shadow-emerald-500/15 disabled:opacity-50 disabled:shadow-none transition-all"
           >
             {uploading ? (
               <>
@@ -425,7 +442,7 @@ export function UploadZone() {
               </>
             ) : (
               <>
-                <Upload className="h-5 w-5 mr-2" />
+                <Shield className="h-5 w-5 mr-2" />
                 Encrypt &amp; Send {files.length}{" "}
                 {files.length === 1 ? "file" : "files"}
               </>
@@ -440,7 +457,7 @@ export function UploadZone() {
 function ChevronIcon({ open }: { open: boolean }) {
   return (
     <svg
-      className={`h-4 w-4 transition-transform ${open ? "rotate-180" : ""}`}
+      className={`h-4 w-4 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
       fill="none"
       viewBox="0 0 24 24"
       stroke="currentColor"

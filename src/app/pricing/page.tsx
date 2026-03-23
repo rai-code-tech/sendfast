@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useSession } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
-import { Check, ArrowRight, Loader2, Zap } from "lucide-react";
+import { Check, ArrowRight, Loader2, Zap, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Navbar } from "@/components/layout/navbar";
 import { useToast } from "@/hooks/use-toast";
@@ -132,15 +132,15 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-noise">
       <Navbar />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
         {/* Header */}
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 rounded-full border border-zinc-800 bg-zinc-900/50 px-4 py-1.5 text-sm text-zinc-400 mb-6">
-            <Zap className="h-4 w-4 text-emerald-400" />
-            Simple pricing
+        <div className="text-center mb-16 animate-fade-in-up">
+          <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/[0.08] px-4 py-1.5 text-sm text-emerald-300 mb-6">
+            <Zap className="h-3.5 w-3.5" />
+            <span className="font-medium">Simple pricing</span>
           </div>
           <h1 className="text-3xl md:text-5xl font-bold text-white mb-4">
             Pick the plan that{" "}
@@ -153,19 +153,19 @@ export default function PricingPage() {
         </div>
 
         {/* Pricing Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto mb-24">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto mb-28 stagger-children">
           {plans.map((plan) => (
             <div
               key={plan.id}
-              className={`relative rounded-xl border p-6 md:p-8 flex flex-col ${
+              className={`relative rounded-2xl p-7 md:p-8 flex flex-col transition-all duration-300 ${
                 plan.popular
-                  ? "border-emerald-500/50 bg-zinc-900/60 shadow-lg shadow-emerald-500/5 md:scale-105"
-                  : "border-zinc-800 bg-zinc-900/30"
+                  ? "border border-emerald-500/40 bg-zinc-900/60 popular-ring md:scale-[1.03]"
+                  : "border border-zinc-800/60 bg-zinc-900/30 hover-glow"
               }`}
             >
               {plan.popular && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <span className="gradient-primary text-white text-xs font-semibold px-3 py-1 rounded-full">
+                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
+                  <span className="gradient-primary text-white text-xs font-semibold px-4 py-1.5 rounded-full shadow-lg shadow-emerald-500/20">
                     Most Popular
                   </span>
                 </div>
@@ -196,15 +196,24 @@ export default function PricingPage() {
                     {feature}
                   </li>
                 ))}
+                {plan.limitations.map((limitation) => (
+                  <li
+                    key={limitation}
+                    className="flex items-start gap-2.5 text-sm text-zinc-600"
+                  >
+                    <X className="h-4 w-4 text-zinc-700 mt-0.5 shrink-0" />
+                    {limitation}
+                  </li>
+                ))}
               </ul>
 
               <Button
                 onClick={() => handleSelectPlan(plan)}
                 disabled={loadingPlan === plan.id}
-                className={`w-full h-12 font-semibold ${
+                className={`w-full h-12 font-semibold transition-all ${
                   plan.popular
-                    ? "gradient-primary hover:opacity-90 text-white border-0"
-                    : "bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700"
+                    ? "gradient-primary hover:opacity-90 text-white border-0 shadow-lg shadow-emerald-500/15"
+                    : "bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700/60"
                 }`}
               >
                 {loadingPlan === plan.id ? (
@@ -221,14 +230,14 @@ export default function PricingPage() {
         </div>
 
         {/* Feature Comparison Table */}
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-4xl mx-auto animate-fade-in-up">
           <h2 className="text-2xl font-bold text-white text-center mb-8">
             Feature Comparison
           </h2>
-          <div className="rounded-xl border border-zinc-800 bg-zinc-900/30 overflow-hidden overflow-x-auto">
+          <div className="rounded-2xl border border-zinc-800/60 bg-zinc-900/30 overflow-hidden overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-zinc-800">
+                <tr className="border-b border-zinc-800/60">
                   <th className="px-6 py-4 text-left text-sm font-medium text-zinc-400">
                     Feature
                   </th>
@@ -243,11 +252,11 @@ export default function PricingPage() {
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-800">
+              <tbody className="divide-y divide-zinc-800/40">
                 {comparison.map((row) => (
                   <tr
                     key={row.feature}
-                    className="hover:bg-zinc-800/30 transition-colors"
+                    className="hover:bg-zinc-800/20 transition-colors"
                   >
                     <td className="px-6 py-3.5 text-sm text-zinc-300">
                       {row.feature}
@@ -261,7 +270,7 @@ export default function PricingPage() {
                           row[plan] ? (
                             <Check className="h-4 w-4 text-emerald-400 mx-auto" />
                           ) : (
-                            <span className="text-zinc-600">&mdash;</span>
+                            <span className="text-zinc-700">&mdash;</span>
                           )
                         ) : (
                           <span className="text-zinc-400">
