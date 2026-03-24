@@ -1,9 +1,17 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import {
   Upload,
   FileIcon,
+  FileText,
+  FileImage,
+  FileVideo,
+  FileAudio,
+  FileArchive,
+  FileCode,
+  FileSpreadsheet,
+  Presentation,
   X,
   Copy,
   Check,
@@ -37,6 +45,32 @@ interface UploadResult {
   encryptionKey: string;
 }
 
+function getFileIconInfo(file: File) {
+  const ext = file.name.split(".").pop()?.toLowerCase() || "";
+  const mime = file.type;
+
+  if (mime.startsWith("image/"))
+    return { icon: FileImage, color: "text-pink-400", bg: "bg-pink-500/10" };
+  if (mime.startsWith("video/"))
+    return { icon: FileVideo, color: "text-purple-400", bg: "bg-purple-500/10" };
+  if (mime.startsWith("audio/"))
+    return { icon: FileAudio, color: "text-orange-400", bg: "bg-orange-500/10" };
+  if (mime === "application/pdf" || ext === "pdf")
+    return { icon: FileText, color: "text-red-400", bg: "bg-red-500/10" };
+  if (["zip", "rar", "7z", "tar", "gz", "bz2"].includes(ext))
+    return { icon: FileArchive, color: "text-amber-400", bg: "bg-amber-500/10" };
+  if (["doc", "docx", "txt", "rtf", "odt", "md"].includes(ext))
+    return { icon: FileText, color: "text-blue-400", bg: "bg-blue-500/10" };
+  if (["xls", "xlsx", "csv", "ods"].includes(ext))
+    return { icon: FileSpreadsheet, color: "text-green-400", bg: "bg-green-500/10" };
+  if (["ppt", "pptx", "key", "odp"].includes(ext))
+    return { icon: Presentation, color: "text-orange-400", bg: "bg-orange-500/10" };
+  if (["js", "ts", "py", "rb", "go", "rs", "java", "cpp", "c", "h", "html", "css", "json", "xml", "yaml", "yml", "sh"].includes(ext))
+    return { icon: FileCode, color: "text-cyan-400", bg: "bg-cyan-500/10" };
+
+  return { icon: FileIcon, color: "text-emerald-400", bg: "bg-emerald-500/10" };
+}
+
 export function UploadZone() {
   const [files, setFiles] = useState<File[]>([]);
   const [expiry, setExpiry] = useState("24h");
@@ -55,7 +89,60 @@ export function UploadZone() {
   const addFileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
+  const [pageDragOver, setPageDragOver] = useState(false);
+  const pageDragCounter = useRef(0);
   const totalSize = files.reduce((sum, f) => sum + f.size, 0);
+
+  // Full-page drag-and-drop: listen on document level
+  useEffect(() => {
+    if (result) return; // Don't listen when showing result
+
+    const handlePageDragEnter = (e: DragEvent) => {
+      e.preventDefault();
+      pageDragCounter.current++;
+      if (e.dataTransfer?.types.includes("Files")) {
+        setPageDragOver(true);
+      }
+    };
+
+    const handlePageDragOver = (e: DragEvent) => {
+      e.preventDefault();
+    };
+
+    const handlePageDragLeave = (e: DragEvent) => {
+      e.preventDefault();
+      pageDragCounter.current--;
+      if (pageDragCounter.current === 0) {
+        setPageDragOver(false);
+      }
+    };
+
+    const handlePageDrop = (e: DragEvent) => {
+      e.preventDefault();
+      pageDragCounter.current = 0;
+      setPageDragOver(false);
+      setDragOver(false);
+      const droppedFiles = Array.from(e.dataTransfer?.files || []);
+      if (droppedFiles.length > 0) {
+        setFiles((prev) => [...prev, ...droppedFiles]);
+        setResult(null);
+        // Scroll to upload zone
+        document.getElementById("upload-zone")?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    };
+
+    document.addEventListener("dragenter", handlePageDragEnter);
+    document.addEventListener("dragover", handlePageDragOver);
+    document.addEventListener("dragleave", handlePageDragLeave);
+    document.addEventListener("drop", handlePageDrop);
+
+    return () => {
+      document.removeEventListener("dragenter", handlePageDragEnter);
+      document.removeEventListener("dragover", handlePageDragOver);
+      document.removeEventListener("dragleave", handlePageDragLeave);
+      document.removeEventListener("drop", handlePageDrop);
+    };
+  }, [result]);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -70,6 +157,8 @@ export function UploadZone() {
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     setDragOver(false);
+    setPageDragOver(false);
+    pageDragCounter.current = 0;
     const droppedFiles = Array.from(e.dataTransfer.files);
     if (droppedFiles.length > 0) {
       setFiles((prev) => [...prev, ...droppedFiles]);
@@ -186,10 +275,25 @@ export function UploadZone() {
     setShowOptions(false);
   };
 
+  // ━━━ FULL-PAGE DROP OVERLAY ━━━
+  const pageOverlay = pageDragOver && !result && (
+    <div className="fixed inset-0 z-[100] bg-zinc-950/80 backdrop-blur-sm flex items-center justify-center pointer-events-none animate-fade-in">
+      <div className="text-center space-y-4">
+        <div className="mx-auto w-20 h-20 rounded-2xl gradient-primary flex items-center justify-center shadow-2xl shadow-emerald-500/30 animate-float">
+          <Upload className="h-10 w-10 text-white" />
+        </div>
+        <div>
+          <p className="text-xl font-semibold text-white">Drop files anywhere</p>
+          <p className="text-sm text-zinc-400 mt-1">They&apos;ll be encrypted in your browser</p>
+        </div>
+      </div>
+    </div>
+  );
+
   // ━━━ SUCCESS STATE ━━━
   if (result) {
     return (
-      <div className="w-full max-w-2xl mx-auto animate-scale-in">
+      <div id="upload-zone" className="w-full max-w-2xl mx-auto animate-scale-in">
         <div className="rounded-2xl border border-emerald-500/20 bg-zinc-900/60 backdrop-blur-sm overflow-hidden">
           {/* Success header */}
           <div className="p-6 pb-5 text-center border-b border-zinc-800/40">
@@ -273,7 +377,8 @@ export function UploadZone() {
   // ━━━ EMPTY STATE — big inviting drop zone ━━━
   if (files.length === 0) {
     return (
-      <div className="w-full max-w-2xl mx-auto">
+      <div id="upload-zone" className="w-full max-w-2xl mx-auto">
+        {pageOverlay}
         <div
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
@@ -323,17 +428,21 @@ export function UploadZone() {
 
   // ━━━ FILES SELECTED — compact action panel ━━━
   return (
-    <div className="w-full max-w-2xl mx-auto">
+    <div id="upload-zone" className="w-full max-w-2xl mx-auto">
+      {pageOverlay}
       <div className="rounded-2xl border border-zinc-800/50 bg-zinc-900/40 backdrop-blur-sm overflow-hidden">
         {/* File list */}
         <div className="divide-y divide-zinc-800/40 max-h-[240px] overflow-y-auto">
-          {files.map((file, index) => (
+          {files.map((file, index) => {
+            const fileInfo = getFileIconInfo(file);
+            const Icon = fileInfo.icon;
+            return (
             <div
               key={`${file.name}-${index}`}
               className="flex items-center gap-3 px-4 py-3 hover:bg-zinc-800/20 transition-colors group"
             >
-              <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center shrink-0">
-                <FileIcon className="h-4 w-4 text-emerald-400" />
+              <div className={`w-8 h-8 rounded-lg ${fileInfo.bg} flex items-center justify-center shrink-0`}>
+                <Icon className={`h-4 w-4 ${fileInfo.color}`} />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm text-zinc-200 truncate">{file.name}</p>
@@ -348,7 +457,8 @@ export function UploadZone() {
                 </button>
               )}
             </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Summary bar + add more */}

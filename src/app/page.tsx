@@ -8,8 +8,9 @@ import {
   Check,
   ArrowRight,
   Globe,
-  Users,
   FileUp,
+  Fingerprint,
+  EyeOff,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -176,65 +177,79 @@ export default function HomePage() {
       </section>
 
       {/* ────────── SOCIAL PROOF BAR ────────── */}
-      <section className="border-y border-zinc-800/40 bg-zinc-900/20 py-10">
+      <section className="border-y border-zinc-800/40 bg-zinc-900/20 py-8">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center stagger-children">
             {[
-              { icon: Shield, stat: "AES-256", label: "Military-grade" },
-              { icon: Globe, stat: "150+", label: "Countries" },
-              { icon: FileUp, stat: "10M+", label: "Files sent" },
-              { icon: Users, stat: "99.9%", label: "Uptime" },
+              { icon: Shield, stat: "AES-256", label: "Military-grade encryption", color: "text-emerald-400" },
+              { icon: Globe, stat: "150+", label: "Countries served", color: "text-cyan-400" },
+              { icon: FileUp, stat: "10M+", label: "Files encrypted", color: "text-violet-400" },
+              { icon: EyeOff, stat: "Zero", label: "Knowledge of your data", color: "text-amber-400" },
             ].map((item) => (
-              <div key={item.stat}>
+              <div key={item.stat} className="group">
                 <div className="flex items-center justify-center gap-2 mb-1">
-                  <item.icon className="h-4 w-4 text-emerald-400" />
-                  <span className="text-xl font-bold text-white">{item.stat}</span>
+                  <item.icon className={`h-4 w-4 ${item.color} group-hover:scale-110 transition-transform`} />
+                  <span className="text-xl font-bold text-white tabular-nums">{item.stat}</span>
                 </div>
-                <p className="text-xs text-zinc-500">{item.label}</p>
+                <p className="text-[11px] text-zinc-500">{item.label}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ────────── HOW IT WORKS — compact ────────── */}
+      {/* ────────── HOW IT WORKS ────────── */}
       <section className="py-20 md:py-28">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl md:text-3xl font-bold text-white text-center mb-12">
+          <h2 className="text-2xl md:text-3xl font-bold text-white text-center mb-3">
             How it <span className="gradient-text">works</span>
           </h2>
+          <p className="text-zinc-500 text-center text-sm mb-12 max-w-md mx-auto">
+            Three steps. Under a minute. Zero accounts needed.
+          </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 stagger-children">
             {[
               {
                 step: "1",
+                icon: FileUp,
                 title: "Drop your files",
-                desc: "Drag and drop or browse. Any file type, any size on paid plans.",
+                desc: "Drag and drop or browse. Any file type, up to 500 MB free.",
                 gradient: "from-emerald-500 to-emerald-600",
+                glow: "shadow-emerald-500/20",
               },
               {
                 step: "2",
+                icon: Fingerprint,
                 title: "Encrypted in-browser",
                 desc: "AES-256-GCM encryption happens locally. Your key never leaves your device.",
                 gradient: "from-cyan-500 to-cyan-600",
+                glow: "shadow-cyan-500/20",
               },
               {
                 step: "3",
+                icon: Mail,
                 title: "Share the link",
-                desc: "Copy the link. The decryption key is in the URL — our server never sees it.",
+                desc: "Copy the link or email it. The decryption key is in the URL — we never see it.",
                 gradient: "from-violet-500 to-violet-600",
+                glow: "shadow-violet-500/20",
               },
             ].map((item, i) => (
-              <div key={item.step} className="relative flex gap-4 md:flex-col md:text-center md:items-center">
+              <div key={item.step} className="relative group">
                 {i < 2 && (
-                  <div className="hidden md:block absolute top-5 left-[60%] w-[80%] h-px bg-gradient-to-r from-zinc-700 to-transparent" />
+                  <div className="hidden md:block absolute top-6 left-[65%] w-[70%] border-t border-dashed border-zinc-800" />
                 )}
-                <div className={`shrink-0 w-10 h-10 rounded-full bg-gradient-to-br ${item.gradient} text-white font-bold text-sm flex items-center justify-center shadow-lg`}>
-                  {item.step}
-                </div>
-                <div>
-                  <h3 className="text-base font-semibold text-white mb-1">{item.title}</h3>
-                  <p className="text-zinc-400 text-sm leading-relaxed">{item.desc}</p>
+                <div className="flex gap-4 md:flex-col md:text-center md:items-center p-5 rounded-xl hover:bg-zinc-900/30 transition-all duration-300">
+                  <div className={`shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br ${item.gradient} text-white flex items-center justify-center shadow-lg ${item.glow} group-hover:scale-110 transition-transform duration-300`}>
+                    <item.icon className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 md:justify-center mb-1.5">
+                      <span className="text-[10px] font-semibold text-zinc-600 uppercase tracking-wider">Step {item.step}</span>
+                    </div>
+                    <h3 className="text-base font-semibold text-white mb-1">{item.title}</h3>
+                    <p className="text-zinc-400 text-sm leading-relaxed">{item.desc}</p>
+                  </div>
                 </div>
               </div>
             ))}
@@ -242,7 +257,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ────────── FEATURES — compact grid ────────── */}
+      {/* ────────── FEATURES ────────── */}
       <section id="features" className="relative py-20 md:py-28 border-t border-zinc-800/40">
         <div className="absolute inset-0 -z-10 bg-radial-center" />
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -250,21 +265,21 @@ export default function HomePage() {
             Everything you need to{" "}
             <span className="gradient-text">send securely</span>
           </h2>
-          <p className="text-zinc-400 text-center mb-12 max-w-lg mx-auto">
-            Security and speed. No compromises.
+          <p className="text-zinc-400 text-center mb-12 max-w-lg mx-auto text-sm">
+            Security and speed, no compromises. Every feature built with privacy-first design.
           </p>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 stagger-children">
             {features.map((feature) => (
               <div
                 key={feature.title}
-                className="group rounded-xl border border-zinc-800/50 bg-zinc-900/30 p-5 hover:bg-zinc-900/50 transition-all duration-200 hover-glow"
+                className="group rounded-xl border border-zinc-800/50 bg-zinc-900/30 p-5 hover:bg-zinc-900/50 transition-all duration-300 hover-glow"
               >
                 <div className="flex items-start gap-3.5">
-                  <div className={`w-9 h-9 rounded-lg bg-gradient-to-br ${feature.color} flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform`}>
-                    <feature.icon className={`h-4.5 w-4.5 ${feature.iconColor}`} />
+                  <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${feature.color} flex items-center justify-center shrink-0 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300`}>
+                    <feature.icon className={`h-5 w-5 ${feature.iconColor}`} />
                   </div>
-                  <div>
+                  <div className="pt-0.5">
                     <h3 className="text-sm font-semibold text-white mb-1">
                       {feature.title}
                     </h3>
@@ -344,27 +359,32 @@ export default function HomePage() {
       </section>
 
       {/* ────────── FINAL CTA ────────── */}
-      <section className="py-20 md:py-28">
+      <section className="py-20 md:py-28 border-t border-zinc-800/40">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="relative rounded-2xl border border-zinc-800/50 bg-zinc-900/40 p-10 md:p-16 text-center overflow-hidden">
+          <div className="relative rounded-2xl border border-zinc-800/50 bg-zinc-900/40 p-10 md:p-16 text-center overflow-hidden hover-glow">
             <div className="absolute inset-0 -z-10">
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] bg-emerald-500/[0.06] rounded-full blur-[100px]" />
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] bg-emerald-500/[0.06] rounded-full blur-[100px] animate-pulse-glow" />
+              <div className="bg-grid absolute inset-0 opacity-50" />
+            </div>
+            <div className="inline-flex items-center gap-1.5 text-[10px] font-medium text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full mb-6 uppercase tracking-wider">
+              <Shield className="h-3 w-3" />
+              Zero-knowledge encryption
             </div>
             <h2 className="text-2xl md:text-4xl font-bold text-white mb-3">
               Ready to send files <span className="gradient-text">securely</span>?
             </h2>
-            <p className="text-zinc-400 max-w-md mx-auto mb-8">
-              No account needed. Just drag, drop, and share.
+            <p className="text-zinc-400 max-w-md mx-auto mb-8 text-sm">
+              No account needed. Just drag, drop, and share. Your files are encrypted before they ever leave your browser.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link href="/#hero">
-                <Button className="h-11 px-8 gradient-primary hover:opacity-90 text-white border-0 font-semibold shadow-lg shadow-emerald-500/15">
+                <Button className="h-12 px-8 gradient-primary hover:opacity-90 text-white border-0 font-semibold shadow-lg shadow-emerald-500/15 text-base">
                   Start Sending Free
                   <ArrowRight className="h-4 w-4 ml-2" />
                 </Button>
               </Link>
               <Link href="/pricing">
-                <Button variant="outline" className="h-11 px-8 border-zinc-700 text-zinc-300 hover:bg-zinc-800/80">
+                <Button variant="outline" className="h-12 px-8 border-zinc-700 text-zinc-300 hover:bg-zinc-800/80">
                   View Plans
                 </Button>
               </Link>
@@ -374,11 +394,11 @@ export default function HomePage() {
       </section>
 
       {/* ────────── FOOTER ────────── */}
-      <footer className="border-t border-zinc-800/40 py-10">
+      <footer className="border-t border-zinc-800/40 py-8">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="gradient-primary rounded-lg p-1">
+            <Link href="/" className="flex items-center gap-2 group">
+              <div className="gradient-primary rounded-lg p-1 group-hover:shadow-emerald-500/20 transition-shadow">
                 <Zap className="h-3.5 w-3.5 text-white" />
               </div>
               <span className="text-sm font-bold text-white">
@@ -393,9 +413,9 @@ export default function HomePage() {
               <Link href="/terms" className="hover:text-zinc-300 transition-colors">Terms</Link>
             </div>
 
-            <div className="flex items-center gap-1.5 text-xs text-zinc-600">
+            <div className="flex items-center gap-1.5 text-[11px] text-zinc-600">
               <Shield className="h-3 w-3 text-emerald-500/50" />
-              AES-256-GCM encrypted
+              End-to-end encrypted
             </div>
           </div>
         </div>

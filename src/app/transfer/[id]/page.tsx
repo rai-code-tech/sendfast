@@ -5,6 +5,14 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import {
   FileIcon,
+  FileText,
+  FileImage,
+  FileVideo,
+  FileAudio,
+  FileArchive,
+  FileCode,
+  FileSpreadsheet,
+  Presentation,
   Download,
   Lock,
   Clock,
@@ -15,6 +23,7 @@ import {
   Shield,
   CheckCircle2,
   ArrowRight,
+  Fingerprint,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -42,6 +51,31 @@ interface TransferInfo {
   createdAt: string;
 }
 
+function getFileIconInfo(name: string, mime: string) {
+  const ext = name.split(".").pop()?.toLowerCase() || "";
+
+  if (mime.startsWith("image/"))
+    return { icon: FileImage, color: "text-pink-400", bg: "bg-pink-500/10" };
+  if (mime.startsWith("video/"))
+    return { icon: FileVideo, color: "text-purple-400", bg: "bg-purple-500/10" };
+  if (mime.startsWith("audio/"))
+    return { icon: FileAudio, color: "text-orange-400", bg: "bg-orange-500/10" };
+  if (mime === "application/pdf" || ext === "pdf")
+    return { icon: FileText, color: "text-red-400", bg: "bg-red-500/10" };
+  if (["zip", "rar", "7z", "tar", "gz", "bz2"].includes(ext))
+    return { icon: FileArchive, color: "text-amber-400", bg: "bg-amber-500/10" };
+  if (["doc", "docx", "txt", "rtf", "odt", "md"].includes(ext))
+    return { icon: FileText, color: "text-blue-400", bg: "bg-blue-500/10" };
+  if (["xls", "xlsx", "csv", "ods"].includes(ext))
+    return { icon: FileSpreadsheet, color: "text-green-400", bg: "bg-green-500/10" };
+  if (["ppt", "pptx", "key", "odp"].includes(ext))
+    return { icon: Presentation, color: "text-orange-400", bg: "bg-orange-500/10" };
+  if (["js", "ts", "py", "rb", "go", "rs", "java", "cpp", "c", "h", "html", "css", "json", "xml", "yaml", "yml", "sh"].includes(ext))
+    return { icon: FileCode, color: "text-cyan-400", bg: "bg-cyan-500/10" };
+
+  return { icon: FileIcon, color: "text-emerald-400", bg: "bg-emerald-500/10" };
+}
+
 export default function TransferPage() {
   const params = useParams();
   const transferId = params.id as string;
@@ -54,6 +88,7 @@ export default function TransferPage() {
   const [needsPassword, setNeedsPassword] = useState(false);
   const [downloading, setDownloading] = useState<string | null>(null);
   const [downloadingAll, setDownloadingAll] = useState(false);
+  const [downloaded, setDownloaded] = useState<Set<string>>(new Set());
 
   const fetchTransfer = useCallback(async (pwd?: string) => {
     try {
@@ -124,6 +159,7 @@ export default function TransferPage() {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
+      setDownloaded((prev) => new Set(prev).add(file.id));
     } catch (err) {
       setError(
         err instanceof Error
@@ -148,9 +184,17 @@ export default function TransferPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-noise">
+        <div className="absolute inset-0 -z-10 bg-radial-top">
+          <div className="bg-grid absolute inset-0" />
+        </div>
         <div className="text-center space-y-4 animate-fade-in">
-          <Loader2 className="h-10 w-10 animate-spin text-emerald-400 mx-auto" />
-          <p className="text-zinc-400">Loading transfer...</p>
+          <div className="mx-auto w-14 h-14 rounded-2xl gradient-primary flex items-center justify-center shadow-lg shadow-emerald-500/20">
+            <Loader2 className="h-7 w-7 animate-spin text-white" />
+          </div>
+          <div>
+            <p className="text-zinc-300 font-medium">Loading transfer</p>
+            <p className="text-zinc-500 text-sm mt-1">Verifying encryption...</p>
+          </div>
         </div>
       </div>
     );
@@ -164,17 +208,17 @@ export default function TransferPage() {
           <div className="bg-grid absolute inset-0" />
         </div>
         <div className="max-w-md w-full text-center space-y-6 animate-fade-in-up">
-          <div className="mx-auto w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center">
+          <div className="mx-auto w-16 h-16 rounded-2xl bg-red-500/10 flex items-center justify-center border border-red-500/20">
             <AlertTriangle className="h-8 w-8 text-red-400" />
           </div>
           <div>
             <h1 className="text-2xl font-bold text-white mb-2">{error}</h1>
-            <p className="text-zinc-400">
+            <p className="text-zinc-400 text-sm">
               This transfer may have expired or the link is invalid.
             </p>
           </div>
           <Link href="/">
-            <Button className="gradient-primary text-white border-0 shadow-lg shadow-emerald-500/15">
+            <Button className="gradient-primary text-white border-0 shadow-lg shadow-emerald-500/15 h-11 px-6">
               Send your own files
               <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
@@ -194,7 +238,7 @@ export default function TransferPage() {
         <div className="max-w-md w-full animate-fade-in-up">
           <div className="rounded-2xl border border-zinc-800/60 bg-zinc-900/40 backdrop-blur-sm p-8 space-y-6 hover-glow">
             <div className="text-center">
-              <div className="mx-auto w-14 h-14 rounded-full bg-amber-500/10 flex items-center justify-center mb-4">
+              <div className="mx-auto w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mb-4">
                 <Lock className="h-7 w-7 text-amber-400" />
               </div>
               <h1 className="text-xl font-bold text-white mb-2">
@@ -214,7 +258,7 @@ export default function TransferPage() {
                   placeholder="Enter password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="bg-zinc-800/40 border-zinc-700/60 hover:border-zinc-600 transition-colors"
+                  className="bg-zinc-800/40 border-zinc-700/60 hover:border-zinc-600 transition-colors h-11"
                   autoFocus
                 />
                 {error && (
@@ -223,11 +267,17 @@ export default function TransferPage() {
               </div>
               <Button
                 type="submit"
-                className="w-full gradient-primary text-white border-0 shadow-lg shadow-emerald-500/15"
+                className="w-full h-11 gradient-primary text-white border-0 shadow-lg shadow-emerald-500/15 font-semibold"
               >
+                <Lock className="h-4 w-4 mr-2" />
                 Unlock Files
               </Button>
             </form>
+          </div>
+
+          <div className="flex items-center justify-center gap-1.5 text-[11px] text-zinc-600 mt-4">
+            <Shield className="h-3 w-3 text-emerald-500/40" />
+            Files are encrypted end-to-end
           </div>
         </div>
       </div>
@@ -249,7 +299,7 @@ export default function TransferPage() {
       <nav className="border-b border-zinc-800/60 py-4 glass">
         <div className="max-w-4xl mx-auto px-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 group">
-            <div className="gradient-primary rounded-lg p-1.5 shadow-lg shadow-emerald-500/10">
+            <div className="gradient-primary rounded-lg p-1.5 shadow-lg shadow-emerald-500/10 group-hover:shadow-emerald-500/20 transition-shadow">
               <Zap className="h-4 w-4 text-white" />
             </div>
             <span className="text-lg font-bold text-white">
@@ -278,64 +328,83 @@ export default function TransferPage() {
                   </p>
                 )}
               </div>
-              <div className="flex items-center gap-1.5 text-xs text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full font-medium">
+              <div className="flex items-center gap-1.5 text-xs text-emerald-400 bg-emerald-500/10 px-2.5 py-1.5 rounded-full font-medium border border-emerald-500/20">
                 <CheckCircle2 className="h-3.5 w-3.5" />
                 Ready
               </div>
             </div>
 
-            <div className="flex flex-wrap gap-4 text-sm text-zinc-500">
+            <div className="flex flex-wrap gap-4 text-xs text-zinc-500">
               <div className="flex items-center gap-1.5">
-                <FileIcon className="h-4 w-4" />
+                <FileIcon className="h-3.5 w-3.5" />
                 {transfer.files.length}{" "}
-                {transfer.files.length === 1 ? "file" : "files"} (
-                {formatBytes(totalSize)})
+                {transfer.files.length === 1 ? "file" : "files"} &middot;{" "}
+                {formatBytes(totalSize)}
               </div>
               <div className="flex items-center gap-1.5">
-                <Eye className="h-4 w-4" />
+                <Eye className="h-3.5 w-3.5" />
                 {transfer.downloadCount}{" "}
                 {transfer.downloadCount === 1 ? "download" : "downloads"}
               </div>
               {transfer.expiresAt && (
                 <div className="flex items-center gap-1.5">
-                  <Clock className="h-4 w-4" />
+                  <Clock className="h-3.5 w-3.5" />
                   Expires {formatDate(transfer.expiresAt)}
                 </div>
               )}
+              <div className="flex items-center gap-1.5">
+                <Fingerprint className="h-3.5 w-3.5 text-emerald-500/70" />
+                <span className="text-emerald-500/70">E2E Encrypted</span>
+              </div>
             </div>
           </div>
 
           {/* File List */}
           <div className="divide-y divide-zinc-800/40">
-            {transfer.files.map((file) => (
-              <div
-                key={file.id}
-                className="flex items-center gap-3 p-4 md:px-8 hover:bg-zinc-800/20 transition-colors group"
-              >
-                <div className="w-9 h-9 rounded-lg bg-emerald-500/10 flex items-center justify-center shrink-0">
-                  <FileIcon className="h-4 w-4 text-emerald-400" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm text-zinc-200 truncate font-medium">{file.name}</p>
-                  <p className="text-xs text-zinc-500">
-                    {formatBytes(file.size)}
-                  </p>
-                </div>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => downloadFile(file)}
-                  disabled={downloading === file.id}
-                  className="text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 opacity-70 group-hover:opacity-100 transition-all"
+            {transfer.files.map((file) => {
+              const fileInfo = getFileIconInfo(file.name, file.type);
+              const Icon = fileInfo.icon;
+              const isDownloaded = downloaded.has(file.id);
+              return (
+                <div
+                  key={file.id}
+                  className="flex items-center gap-3 p-4 md:px-8 hover:bg-zinc-800/20 transition-colors group"
                 >
-                  {downloading === file.id ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Download className="h-4 w-4" />
-                  )}
-                </Button>
-              </div>
-            ))}
+                  <div className={`w-9 h-9 rounded-lg ${fileInfo.bg} flex items-center justify-center shrink-0`}>
+                    <Icon className={`h-4 w-4 ${fileInfo.color}`} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-zinc-200 truncate font-medium">{file.name}</p>
+                    <p className="text-xs text-zinc-500">
+                      {formatBytes(file.size)}
+                      {isDownloaded && (
+                        <span className="text-emerald-500 ml-2">
+                          <CheckCircle2 className="h-3 w-3 inline mr-0.5" />
+                          Downloaded
+                        </span>
+                      )}
+                    </p>
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => downloadFile(file)}
+                    disabled={downloading === file.id}
+                    className={`transition-all ${
+                      isDownloaded
+                        ? "text-emerald-500/50 hover:text-emerald-400 hover:bg-emerald-500/10"
+                        : "text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 opacity-70 group-hover:opacity-100"
+                    }`}
+                  >
+                    {downloading === file.id ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Download className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
+              );
+            })}
           </div>
 
           {/* Download All */}
@@ -365,9 +434,18 @@ export default function TransferPage() {
           </div>
         </div>
 
-        <div className="flex items-center justify-center gap-1.5 text-xs text-zinc-600 mt-6">
-          <Shield className="h-3.5 w-3.5 text-emerald-500/50" />
-          Files are decrypted in your browser. The server never sees your data.
+        {/* Powered by + security */}
+        <div className="flex flex-col items-center gap-2 mt-6">
+          <div className="flex items-center justify-center gap-1.5 text-[11px] text-zinc-600">
+            <Shield className="h-3 w-3 text-emerald-500/40" />
+            Files are decrypted in your browser. The server never sees your data.
+          </div>
+          <Link href="/" className="group flex items-center gap-1.5 text-[11px] text-zinc-600 hover:text-zinc-400 transition-colors">
+            Powered by
+            <span className="font-semibold text-zinc-500 group-hover:text-white transition-colors">
+              Send<span className="gradient-text">Fast</span>
+            </span>
+          </Link>
         </div>
       </div>
     </div>
