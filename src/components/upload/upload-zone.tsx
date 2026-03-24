@@ -417,7 +417,7 @@ export function UploadZone() {
                 <span className="gradient-text font-semibold">browse</span>
               </p>
               <p className="text-sm text-zinc-500">
-                Up to 500 MB free &middot; No account needed
+                Up to 2 GB free &middot; No account needed
               </p>
             </div>
           </div>

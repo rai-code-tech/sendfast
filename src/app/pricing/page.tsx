@@ -16,9 +16,9 @@ const plans = [
     period: "forever",
     description: "Perfect for quick, one-off transfers",
     features: [
-      "500 MB per transfer",
-      "24-hour expiry",
-      "5 transfers per day",
+      "2 GB per transfer",
+      "7-day expiry",
+      "10 transfers per month",
       "End-to-end encryption",
       "Shareable links",
     ],
@@ -38,9 +38,9 @@ const plans = [
     period: "per month",
     description: "For professionals who send files regularly",
     features: [
-      "5 GB per transfer",
+      "25 GB per transfer",
       "30-day expiry",
-      "Unlimited transfers",
+      "100 transfers per month",
       "End-to-end encryption",
       "Password protection",
       "Email delivery",
@@ -59,9 +59,9 @@ const plans = [
     period: "per month",
     description: "For teams and power users",
     features: [
-      "Unlimited file size",
-      "Custom expiry (or never)",
-      "Unlimited transfers",
+      "100 GB per transfer",
+      "90-day expiry",
+      "500 transfers per month",
       "End-to-end encryption",
       "Password protection",
       "Email delivery",
@@ -78,9 +78,9 @@ const plans = [
 ];
 
 const comparison = [
-  { feature: "Max file size", free: "500 MB", starter: "5 GB", pro: "Unlimited" },
-  { feature: "Link expiry", free: "24 hours", starter: "30 days", pro: "Custom / Never" },
-  { feature: "Transfers per day", free: "5", starter: "Unlimited", pro: "Unlimited" },
+  { feature: "Max transfer size", free: "2 GB", starter: "25 GB", pro: "100 GB" },
+  { feature: "Link expiry", free: "7 days", starter: "30 days", pro: "90 days" },
+  { feature: "Transfers per month", free: "10", starter: "100", pro: "500" },
   { feature: "End-to-end encryption", free: true, starter: true, pro: true },
   { feature: "Password protection", free: false, starter: true, pro: true },
   { feature: "Email delivery", free: false, starter: true, pro: true },
