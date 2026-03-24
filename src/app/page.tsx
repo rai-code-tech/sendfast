@@ -10,7 +10,6 @@ import {
   Globe,
   Users,
   FileUp,
-  Sparkles,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -20,9 +19,9 @@ import { UploadZone } from "@/components/upload/upload-zone";
 const features = [
   {
     icon: Shield,
-    title: "End-to-End Encryption",
+    title: "End-to-End Encrypted",
     description:
-      "AES-256-GCM encryption happens in your browser. We never see your files or encryption keys.",
+      "AES-256-GCM encryption in your browser. We never see your files.",
     color: "from-emerald-500/20 to-emerald-500/5",
     iconColor: "text-emerald-400",
   },
@@ -30,15 +29,15 @@ const features = [
     icon: Zap,
     title: "Lightning Fast",
     description:
-      "Optimized for speed with chunked uploads and parallel processing. Send gigabytes in seconds.",
+      "Chunked uploads with parallel processing. Gigabytes in seconds.",
     color: "from-cyan-500/20 to-cyan-500/5",
     iconColor: "text-cyan-400",
   },
   {
     icon: Clock,
-    title: "Expiring Links",
+    title: "Auto-Expiring Links",
     description:
-      "Set files to auto-delete after 1 hour, 24 hours, 7 days, or 30 days. You are in control.",
+      "Files auto-delete after 1h, 24h, 7 days, or 30 days.",
     color: "from-violet-500/20 to-violet-500/5",
     iconColor: "text-violet-400",
   },
@@ -46,7 +45,7 @@ const features = [
     icon: Lock,
     title: "Password Protection",
     description:
-      "Add an extra layer of security with password-protected transfers.",
+      "Add passwords for an extra layer of security on transfers.",
     color: "from-amber-500/20 to-amber-500/5",
     iconColor: "text-amber-400",
   },
@@ -54,7 +53,7 @@ const features = [
     icon: Mail,
     title: "Email Delivery",
     description:
-      "Send download links directly to recipients via email with optional messages.",
+      "Send download links directly to recipients with a message.",
     color: "from-blue-500/20 to-blue-500/5",
     iconColor: "text-blue-400",
   },
@@ -62,7 +61,7 @@ const features = [
     icon: BarChart3,
     title: "Download Tracking",
     description:
-      "See who downloaded your files, when, and how many times. Stay informed.",
+      "See who downloaded, when, and how many times.",
     color: "from-rose-500/20 to-rose-500/5",
     iconColor: "text-rose-400",
   },
@@ -73,13 +72,12 @@ const plans = [
     name: "Free",
     price: "$0",
     period: "forever",
-    description: "Perfect for quick, one-off transfers",
+    description: "Quick, one-off transfers",
     features: [
       "500 MB per transfer",
       "24-hour expiry",
       "5 transfers per day",
       "End-to-end encryption",
-      "Shareable links",
     ],
     cta: "Start Sending",
     href: "/#hero",
@@ -88,8 +86,8 @@ const plans = [
   {
     name: "Starter",
     price: "$9",
-    period: "per month",
-    description: "For professionals who send files regularly",
+    period: "mo",
+    description: "For professionals",
     features: [
       "5 GB per transfer",
       "30-day expiry",
@@ -105,14 +103,12 @@ const plans = [
   {
     name: "Pro",
     price: "$19",
-    period: "per month",
-    description: "For teams and power users",
+    period: "mo",
+    description: "For teams & power users",
     features: [
       "Unlimited file size",
-      "Custom expiry (or never)",
-      "Unlimited transfers",
+      "Custom expiry",
       "Everything in Starter",
-      "Priority support",
       "API access",
       "Custom branding",
     ],
@@ -124,219 +120,206 @@ const plans = [
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-noise">
+    <div className="min-h-screen">
       <Navbar />
 
-      {/* Hero Section */}
+      {/* ────────── HERO: The product IS the landing page ────────── */}
       <section
         id="hero"
-        className="relative overflow-hidden pt-24 pb-32 md:pt-36 md:pb-44"
+        className="relative overflow-hidden pt-12 pb-20 md:pt-20 md:pb-28"
       >
-        {/* Animated background */}
-        <div className="absolute inset-0 -z-10 bg-radial-top">
+        {/* Ambient background */}
+        <div className="absolute inset-0 -z-10">
           <div className="bg-grid absolute inset-0" />
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[600px] bg-emerald-500/[0.07] rounded-full blur-[100px] animate-pulse-glow" />
-          <div className="absolute top-40 left-1/4 w-[500px] h-[400px] bg-cyan-500/[0.05] rounded-full blur-[80px] animate-pulse-glow [animation-delay:1.5s]" />
-          <div className="absolute top-20 right-1/4 w-[300px] h-[300px] bg-violet-500/[0.04] rounded-full blur-[60px] animate-pulse-glow [animation-delay:3s]" />
+          <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-emerald-500/[0.07] rounded-full blur-[120px] animate-pulse-glow" />
+          <div className="absolute top-[10%] right-[10%] w-[400px] h-[400px] bg-cyan-500/[0.04] rounded-full blur-[80px] animate-pulse-glow [animation-delay:2s]" />
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-14 animate-fade-in-up">
-            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/[0.08] px-4 py-1.5 text-sm text-emerald-300 mb-8 shimmer-bar">
-              <Shield className="h-3.5 w-3.5" />
-              <span className="font-medium">Zero-knowledge encryption</span>
-              <Sparkles className="h-3.5 w-3.5" />
-            </div>
-            <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight text-white mb-6 leading-[1.1]">
-              Send files fast.{" "}
-              <br className="hidden sm:block" />
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Compact headline */}
+          <div className="text-center max-w-2xl mx-auto mb-10 animate-fade-in-up">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-white mb-4 leading-[1.1]">
+              Send files.{" "}
               <span className="gradient-text">Encrypted.</span>
             </h1>
-            <p className="text-lg md:text-xl text-zinc-400 max-w-2xl mx-auto leading-relaxed">
-              Upload, encrypt, and share files in seconds. Your files are
-              encrypted in your browser before they ever leave your device.{" "}
-              <span className="text-zinc-300 font-medium">We never see your data.</span>
+            <p className="text-base md:text-lg text-zinc-400 max-w-lg mx-auto">
+              Drop your files below. They&apos;re encrypted in your browser before upload.
+              No account needed.
             </p>
           </div>
 
-          {/* Upload Zone */}
-          <div className="animate-fade-in-up [animation-delay:200ms]">
+          {/* THE UPLOAD ZONE — the star of the page */}
+          <div className="animate-fade-in-up [animation-delay:150ms]">
             <UploadZone />
           </div>
+
+          {/* Inline trust indicators */}
+          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 mt-8 text-xs text-zinc-500 animate-fade-in [animation-delay:400ms]">
+            <span className="flex items-center gap-1.5">
+              <Shield className="h-3.5 w-3.5 text-emerald-400/70" />
+              AES-256-GCM
+            </span>
+            <span className="flex items-center gap-1.5">
+              <Lock className="h-3.5 w-3.5 text-emerald-400/70" />
+              Zero-knowledge
+            </span>
+            <span className="flex items-center gap-1.5">
+              <Zap className="h-3.5 w-3.5 text-emerald-400/70" />
+              No account required
+            </span>
+            <span className="flex items-center gap-1.5">
+              <Clock className="h-3.5 w-3.5 text-emerald-400/70" />
+              Auto-expiring links
+            </span>
+          </div>
         </div>
       </section>
 
-      {/* Trust Bar */}
-      <section className="relative border-y border-zinc-800/60 bg-zinc-900/20 py-14">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center stagger-children">
+      {/* ────────── SOCIAL PROOF BAR ────────── */}
+      <section className="border-y border-zinc-800/40 bg-zinc-900/20 py-10">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             {[
-              { icon: Shield, stat: "AES-256", label: "Military-grade encryption" },
-              { icon: Globe, stat: "150+", label: "Countries served" },
-              { icon: FileUp, stat: "10M+", label: "Files transferred" },
-              { icon: Users, stat: "99.9%", label: "Uptime SLA" },
+              { icon: Shield, stat: "AES-256", label: "Military-grade" },
+              { icon: Globe, stat: "150+", label: "Countries" },
+              { icon: FileUp, stat: "10M+", label: "Files sent" },
+              { icon: Users, stat: "99.9%", label: "Uptime" },
             ].map((item) => (
-              <div key={item.stat} className="group">
-                <div className="flex items-center justify-center gap-2.5 mb-2">
-                  <item.icon className="h-5 w-5 text-emerald-400 group-hover:scale-110 transition-transform" />
-                  <span className="text-2xl font-bold text-white">{item.stat}</span>
+              <div key={item.stat}>
+                <div className="flex items-center justify-center gap-2 mb-1">
+                  <item.icon className="h-4 w-4 text-emerald-400" />
+                  <span className="text-xl font-bold text-white">{item.stat}</span>
                 </div>
-                <p className="text-sm text-zinc-500">{item.label}</p>
+                <p className="text-xs text-zinc-500">{item.label}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section id="features" className="relative py-28 md:py-36">
-        <div className="absolute inset-0 -z-10 bg-radial-center" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <p className="text-sm font-semibold uppercase tracking-widest text-emerald-400 mb-3">
-              Features
-            </p>
-            <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">
-              Everything you need to{" "}
-              <span className="gradient-text">send securely</span>
-            </h2>
-            <p className="text-zinc-400 text-lg max-w-2xl mx-auto">
-              Built with security and speed at the core. No compromises.
-            </p>
-          </div>
+      {/* ────────── HOW IT WORKS — compact ────────── */}
+      <section className="py-20 md:py-28">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-2xl md:text-3xl font-bold text-white text-center mb-12">
+            How it <span className="gradient-text">works</span>
+          </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 stagger-children">
-            {features.map((feature) => (
-              <div
-                key={feature.title}
-                className="group relative rounded-2xl border border-zinc-800/60 bg-zinc-900/30 p-7 hover:bg-zinc-900/50 transition-all duration-300 hover-glow shine"
-              >
-                <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${feature.color} flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300`}>
-                  <feature.icon className={`h-6 w-6 ${feature.iconColor}`} />
-                </div>
-                <h3 className="text-lg font-semibold text-white mb-2">
-                  {feature.title}
-                </h3>
-                <p className="text-zinc-400 text-sm leading-relaxed">
-                  {feature.description}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* How It Works */}
-      <section className="relative py-28 md:py-36 border-t border-zinc-800/60">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <p className="text-sm font-semibold uppercase tracking-widest text-cyan-400 mb-3">
-              Simple Process
-            </p>
-            <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">
-              How it <span className="gradient-text">works</span>
-            </h2>
-            <p className="text-zinc-400 text-lg max-w-2xl mx-auto">
-              Three simple steps. Your files never leave your browser unencrypted.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto stagger-children">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
               {
-                step: "01",
-                title: "Select your files",
-                desc: "Drag and drop or browse to select any files. No size limits on paid plans.",
+                step: "1",
+                title: "Drop your files",
+                desc: "Drag and drop or browse. Any file type, any size on paid plans.",
                 gradient: "from-emerald-500 to-emerald-600",
               },
               {
-                step: "02",
+                step: "2",
                 title: "Encrypted in-browser",
-                desc: "AES-256-GCM encryption happens locally. Your key never touches our servers.",
+                desc: "AES-256-GCM encryption happens locally. Your key never leaves your device.",
                 gradient: "from-cyan-500 to-cyan-600",
               },
               {
-                step: "03",
+                step: "3",
                 title: "Share the link",
-                desc: "Get a secure link with the decryption key embedded. Only your recipient can decrypt.",
+                desc: "Copy the link. The decryption key is in the URL — our server never sees it.",
                 gradient: "from-violet-500 to-violet-600",
               },
             ].map((item, i) => (
-              <div key={item.step} className="relative text-center group">
-                {/* Connector line */}
+              <div key={item.step} className="relative flex gap-4 md:flex-col md:text-center md:items-center">
                 {i < 2 && (
-                  <div className="hidden md:block absolute top-6 left-[60%] w-[80%] h-px bg-gradient-to-r from-zinc-700 to-transparent" />
+                  <div className="hidden md:block absolute top-5 left-[60%] w-[80%] h-px bg-gradient-to-r from-zinc-700 to-transparent" />
                 )}
-                <div className={`inline-flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br ${item.gradient} text-white font-bold text-lg mb-5 shadow-lg shadow-emerald-500/10 group-hover:scale-110 transition-transform`}>
+                <div className={`shrink-0 w-10 h-10 rounded-full bg-gradient-to-br ${item.gradient} text-white font-bold text-sm flex items-center justify-center shadow-lg`}>
                   {item.step}
                 </div>
-                <h3 className="text-lg font-semibold text-white mb-2">{item.title}</h3>
-                <p className="text-zinc-400 text-sm leading-relaxed">{item.desc}</p>
+                <div>
+                  <h3 className="text-base font-semibold text-white mb-1">{item.title}</h3>
+                  <p className="text-zinc-400 text-sm leading-relaxed">{item.desc}</p>
+                </div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Pricing Section */}
-      <section id="pricing" className="relative py-28 md:py-36">
-        <div className="absolute inset-0 -z-10 bg-radial-top" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <p className="text-sm font-semibold uppercase tracking-widest text-emerald-400 mb-3">
-              Pricing
-            </p>
-            <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">
-              Simple, transparent{" "}
-              <span className="gradient-text">pricing</span>
-            </h2>
-            <p className="text-zinc-400 text-lg max-w-2xl mx-auto">
-              Start free. Upgrade when you need more power.
-            </p>
-          </div>
+      {/* ────────── FEATURES — compact grid ────────── */}
+      <section id="features" className="relative py-20 md:py-28 border-t border-zinc-800/40">
+        <div className="absolute inset-0 -z-10 bg-radial-center" />
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-2xl md:text-3xl font-bold text-white text-center mb-4">
+            Everything you need to{" "}
+            <span className="gradient-text">send securely</span>
+          </h2>
+          <p className="text-zinc-400 text-center mb-12 max-w-lg mx-auto">
+            Security and speed. No compromises.
+          </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto stagger-children">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {features.map((feature) => (
+              <div
+                key={feature.title}
+                className="group rounded-xl border border-zinc-800/50 bg-zinc-900/30 p-5 hover:bg-zinc-900/50 transition-all duration-200 hover-glow"
+              >
+                <div className="flex items-start gap-3.5">
+                  <div className={`w-9 h-9 rounded-lg bg-gradient-to-br ${feature.color} flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform`}>
+                    <feature.icon className={`h-4.5 w-4.5 ${feature.iconColor}`} />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-semibold text-white mb-1">
+                      {feature.title}
+                    </h3>
+                    <p className="text-zinc-500 text-xs leading-relaxed">
+                      {feature.description}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ────────── PRICING — compact ────────── */}
+      <section id="pricing" className="relative py-20 md:py-28">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-2xl md:text-3xl font-bold text-white text-center mb-3">
+            Simple <span className="gradient-text">pricing</span>
+          </h2>
+          <p className="text-zinc-400 text-center mb-12 max-w-md mx-auto">
+            Start free. Upgrade when you need more.
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-4xl mx-auto">
             {plans.map((plan) => (
               <div
                 key={plan.name}
-                className={`relative rounded-2xl p-7 flex flex-col transition-all duration-300 ${
+                className={`relative rounded-2xl p-6 flex flex-col transition-all duration-200 ${
                   plan.popular
-                    ? "border border-emerald-500/40 bg-zinc-900/60 popular-ring md:scale-[1.03]"
-                    : "border border-zinc-800/60 bg-zinc-900/30 hover-glow"
+                    ? "border border-emerald-500/40 bg-zinc-900/60 popular-ring"
+                    : "border border-zinc-800/50 bg-zinc-900/30 hover-glow"
                 }`}
               >
                 {plan.popular && (
-                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-                    <span className="gradient-primary text-white text-xs font-semibold px-4 py-1.5 rounded-full shadow-lg shadow-emerald-500/20">
-                      Most Popular
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                    <span className="gradient-primary text-white text-[10px] font-semibold px-3 py-1 rounded-full uppercase tracking-wide">
+                      Popular
                     </span>
                   </div>
                 )}
 
-                <div className="mb-7">
-                  <h3 className="text-lg font-semibold text-white mb-1">
-                    {plan.name}
-                  </h3>
-                  <p className="text-sm text-zinc-500 mb-5">
-                    {plan.description}
-                  </p>
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-5xl font-bold text-white">
-                      {plan.price}
-                    </span>
-                    <span className="text-zinc-500 text-sm">
-                      /{plan.period}
-                    </span>
+                <div className="mb-5">
+                  <h3 className="text-base font-semibold text-white">{plan.name}</h3>
+                  <p className="text-xs text-zinc-500 mb-3">{plan.description}</p>
+                  <div className="flex items-baseline gap-0.5">
+                    <span className="text-4xl font-bold text-white">{plan.price}</span>
+                    <span className="text-zinc-500 text-xs">/{plan.period}</span>
                   </div>
                 </div>
 
-                <ul className="space-y-3 mb-8 flex-1">
+                <ul className="space-y-2 mb-6 flex-1">
                   {plan.features.map((feature) => (
-                    <li
-                      key={feature}
-                      className="flex items-start gap-2.5 text-sm text-zinc-300"
-                    >
-                      <Check className="h-4 w-4 text-emerald-400 mt-0.5 shrink-0" />
+                    <li key={feature} className="flex items-start gap-2 text-xs text-zinc-300">
+                      <Check className="h-3.5 w-3.5 text-emerald-400 mt-0.5 shrink-0" />
                       {feature}
                     </li>
                   ))}
@@ -344,14 +327,14 @@ export default function HomePage() {
 
                 <Link href={plan.href}>
                   <Button
-                    className={`w-full h-11 font-semibold transition-all duration-200 ${
+                    className={`w-full h-10 text-sm font-semibold ${
                       plan.popular
                         ? "gradient-primary hover:opacity-90 text-white border-0 shadow-lg shadow-emerald-500/15"
                         : "bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700"
                     }`}
                   >
                     {plan.cta}
-                    <ArrowRight className="h-4 w-4 ml-2" />
+                    <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
                   </Button>
                 </Link>
               </div>
@@ -360,32 +343,28 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Final CTA */}
-      <section className="py-28 md:py-36">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="relative rounded-3xl border border-zinc-800/60 bg-zinc-900/40 p-12 md:p-20 text-center overflow-hidden">
+      {/* ────────── FINAL CTA ────────── */}
+      <section className="py-20 md:py-28">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="relative rounded-2xl border border-zinc-800/50 bg-zinc-900/40 p-10 md:p-16 text-center overflow-hidden">
             <div className="absolute inset-0 -z-10">
-              <div className="bg-grid absolute inset-0" />
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-emerald-500/[0.06] rounded-full blur-[100px]" />
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] bg-emerald-500/[0.06] rounded-full blur-[100px]" />
             </div>
-            <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">
+            <h2 className="text-2xl md:text-4xl font-bold text-white mb-3">
               Ready to send files <span className="gradient-text">securely</span>?
             </h2>
-            <p className="text-zinc-400 text-lg max-w-xl mx-auto mb-10">
-              No account needed. No software to install. Just drag, drop, and share.
+            <p className="text-zinc-400 max-w-md mx-auto mb-8">
+              No account needed. Just drag, drop, and share.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link href="/#hero">
-                <Button className="h-13 px-10 gradient-primary hover:opacity-90 text-white border-0 text-base font-semibold shadow-lg shadow-emerald-500/15">
+                <Button className="h-11 px-8 gradient-primary hover:opacity-90 text-white border-0 font-semibold shadow-lg shadow-emerald-500/15">
                   Start Sending Free
-                  <ArrowRight className="h-5 w-5 ml-2" />
+                  <ArrowRight className="h-4 w-4 ml-2" />
                 </Button>
               </Link>
               <Link href="/pricing">
-                <Button
-                  variant="outline"
-                  className="h-13 px-10 border-zinc-700 text-zinc-300 hover:bg-zinc-800/80 text-base"
-                >
+                <Button variant="outline" className="h-11 px-8 border-zinc-700 text-zinc-300 hover:bg-zinc-800/80">
                   View Plans
                 </Button>
               </Link>
@@ -394,98 +373,29 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-zinc-800/60 py-14">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            <div className="col-span-2 md:col-span-1">
-              <Link href="/" className="flex items-center gap-2 mb-4">
-                <div className="gradient-primary rounded-lg p-1.5">
-                  <Zap className="h-4 w-4 text-white" />
-                </div>
-                <span className="text-lg font-bold text-white">
-                  Send<span className="gradient-text">Fast</span>
-                </span>
-              </Link>
-              <p className="text-sm text-zinc-500 leading-relaxed">
-                Fast, encrypted file transfers with zero-knowledge security.
-              </p>
+      {/* ────────── FOOTER ────────── */}
+      <footer className="border-t border-zinc-800/40 py-10">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <Link href="/" className="flex items-center gap-2">
+              <div className="gradient-primary rounded-lg p-1">
+                <Zap className="h-3.5 w-3.5 text-white" />
+              </div>
+              <span className="text-sm font-bold text-white">
+                Send<span className="gradient-text">Fast</span>
+              </span>
+            </Link>
+
+            <div className="flex items-center gap-6 text-xs text-zinc-500">
+              <Link href="/#features" className="hover:text-zinc-300 transition-colors">Features</Link>
+              <Link href="/pricing" className="hover:text-zinc-300 transition-colors">Pricing</Link>
+              <Link href="/privacy" className="hover:text-zinc-300 transition-colors">Privacy</Link>
+              <Link href="/terms" className="hover:text-zinc-300 transition-colors">Terms</Link>
             </div>
 
-            <div>
-              <h4 className="text-sm font-semibold text-zinc-300 mb-4">Product</h4>
-              <ul className="space-y-2.5">
-                <li>
-                  <Link
-                    href="/#features"
-                    className="text-sm text-zinc-500 hover:text-zinc-300 transition-colors"
-                  >
-                    Features
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/pricing"
-                    className="text-sm text-zinc-500 hover:text-zinc-300 transition-colors"
-                  >
-                    Pricing
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="text-sm font-semibold text-zinc-300 mb-4">Legal</h4>
-              <ul className="space-y-2.5">
-                <li>
-                  <Link
-                    href="/privacy"
-                    className="text-sm text-zinc-500 hover:text-zinc-300 transition-colors"
-                  >
-                    Privacy Policy
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/terms"
-                    className="text-sm text-zinc-500 hover:text-zinc-300 transition-colors"
-                  >
-                    Terms of Service
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="text-sm font-semibold text-zinc-300 mb-4">Support</h4>
-              <ul className="space-y-2.5">
-                <li>
-                  <Link
-                    href="/contact"
-                    className="text-sm text-zinc-500 hover:text-zinc-300 transition-colors"
-                  >
-                    Contact
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/docs"
-                    className="text-sm text-zinc-500 hover:text-zinc-300 transition-colors"
-                  >
-                    API Docs
-                  </Link>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="border-t border-zinc-800/60 mt-12 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p className="text-sm text-zinc-600">
-              &copy; {new Date().getFullYear()} SendFast. All rights reserved.
-            </p>
             <div className="flex items-center gap-1.5 text-xs text-zinc-600">
-              <Shield className="h-3.5 w-3.5 text-emerald-500/50" />
-              Protected by AES-256-GCM encryption
+              <Shield className="h-3 w-3 text-emerald-500/50" />
+              AES-256-GCM encrypted
             </div>
           </div>
         </div>
