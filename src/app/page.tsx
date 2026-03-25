@@ -4,13 +4,15 @@ import {
   Clock,
   Lock,
   Mail,
-  BarChart3,
   Check,
   ArrowRight,
   Globe,
   FileUp,
   Fingerprint,
   EyeOff,
+  Bot,
+  Code,
+  Workflow,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -59,10 +61,10 @@ const features = [
     iconColor: "text-blue-400",
   },
   {
-    icon: BarChart3,
-    title: "Download Tracking",
+    icon: Bot,
+    title: "Agentic File Transfer",
     description:
-      "See who downloaded, when, and how many times.",
+      "REST API for AI agents to send files to humans. Built for agentic workflows.",
     color: "from-rose-500/20 to-rose-500/5",
     iconColor: "text-rose-400",
   },
@@ -290,6 +292,73 @@ export default function HomePage() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ────────── AGENTIC SECTION ────────── */}
+      <section className="relative py-20 md:py-28 border-t border-zinc-800/40">
+        <div className="absolute inset-0 -z-10">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-violet-500/[0.04] rounded-full blur-[100px]" />
+        </div>
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            {/* Left: copy */}
+            <div>
+              <div className="inline-flex items-center gap-1.5 text-[10px] font-medium text-violet-400 bg-violet-500/10 px-3 py-1 rounded-full mb-4 uppercase tracking-wider">
+                <Bot className="h-3 w-3" />
+                Agentic
+              </div>
+              <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
+                Built for humans{" "}
+                <span className="gradient-text">and AI agents</span>
+              </h2>
+              <p className="text-zinc-400 text-sm leading-relaxed mb-6">
+                SendFast is the file transfer layer for agentic workflows. Your AI assistants can use our REST API to securely send files to you — reports, exports, generated content — all encrypted end-to-end.
+              </p>
+              <ul className="space-y-3">
+                {[
+                  { icon: Code, text: "REST API with full encryption support" },
+                  { icon: Bot, text: "AI agents send files to their users securely" },
+                  { icon: Workflow, text: "Integrate into any agentic pipeline" },
+                  { icon: Shield, text: "Same zero-knowledge encryption, always" },
+                ].map((item) => (
+                  <li key={item.text} className="flex items-center gap-3 text-sm text-zinc-300">
+                    <div className="w-7 h-7 rounded-lg bg-violet-500/10 flex items-center justify-center shrink-0">
+                      <item.icon className="h-3.5 w-3.5 text-violet-400" />
+                    </div>
+                    {item.text}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Right: code snippet */}
+            <div className="rounded-2xl border border-zinc-800/50 bg-zinc-950/60 overflow-hidden">
+              <div className="flex items-center gap-2 px-4 py-3 border-b border-zinc-800/50 bg-zinc-900/30">
+                <div className="flex gap-1.5">
+                  <div className="w-2.5 h-2.5 rounded-full bg-zinc-700" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-zinc-700" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-zinc-700" />
+                </div>
+                <span className="text-[10px] text-zinc-600 ml-2 font-mono">agent-transfer.ts</span>
+              </div>
+              <pre className="p-5 text-xs leading-relaxed overflow-x-auto font-mono">
+                <code>
+<span className="text-zinc-600">{`// Your AI agent sends files via SendFast`}</span>{`
+`}<span className="text-violet-400">const</span>{` transfer = `}<span className="text-violet-400">await</span>{` sendfast.upload(`}&#123;{`
+  files: [encryptedReport],
+  expiry: `}<span className="text-emerald-400">&quot;7d&quot;</span>{`,
+  email: `}<span className="text-emerald-400">&quot;user@company.com&quot;</span>{`,
+  message: `}<span className="text-emerald-400">&quot;Your weekly analytics report&quot;</span>{`
+`}&#125;{`);
+
+`}<span className="text-zinc-600">{`// → Encrypted, delivered, zero-knowledge`}</span>{`
+console.log(transfer.shareUrl);
+`}<span className="text-zinc-600">{`// https://sendfast.app/transfer/abc#key`}</span>
+                </code>
+              </pre>
+            </div>
           </div>
         </div>
       </section>

@@ -1,10 +1,12 @@
 # SendFast — Complete Reference
 
-> End-to-end encrypted file transfer. Zero-knowledge. No account required.
+> The agentic file transfer service. Encrypted. Zero-knowledge. Built for humans and AI agents.
 
 ## Overview
 
-SendFast lets users send files of any type with client-side AES-256-GCM encryption. Files are encrypted in the browser before upload. The encryption key is embedded in the URL fragment (#key=...) and never transmitted to SendFast servers, ensuring true zero-knowledge architecture.
+SendFast is an end-to-end encrypted file transfer service designed for both humans and AI agents. Files are encrypted client-side using AES-256-GCM. The encryption key is embedded in the URL fragment (#key=...) and never transmitted to SendFast servers, ensuring true zero-knowledge architecture.
+
+AI agents can use the SendFast REST API to securely send files (reports, exports, generated assets) to their users, or create receive links to collect files from humans for processing. This makes SendFast the file transfer layer for agentic workflows.
 
 ## How Encryption Works
 

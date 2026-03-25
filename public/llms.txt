@@ -1,13 +1,21 @@
 # SendFast
 
-> Send files. Fast. Encrypted. End-to-end encrypted file transfer with zero-knowledge security.
+> The agentic file transfer service. Send files from AI agents to humans — encrypted, fast, zero-knowledge.
 
-SendFast is a file transfer service that encrypts files in the browser using AES-256-GCM before upload. The encryption key is stored in the URL fragment and never sent to our servers.
+SendFast is an end-to-end encrypted file transfer service built for humans and AI agents. Files are encrypted client-side using AES-256-GCM. The encryption key lives in the URL fragment and never touches our servers. AI agents can use the REST API to securely send files (reports, exports, generated content) to their users.
 
 ## Docs
 
-- [How It Works](/llms-full.txt): Detailed technical overview, pricing, and API reference
+- [How It Works](/llms-full.txt): Technical overview, pricing, API reference, and agent integration guide
 - [API Documentation](/api-docs.txt): REST API endpoints for programmatic file transfers
+
+## Why Agents Use SendFast
+
+- **Send files to users**: AI agents can upload encrypted files and email download links to humans
+- **Collect files from users**: Create receive links so users can securely upload files for agent processing
+- **Zero-knowledge**: Even SendFast cannot see the files — true privacy for sensitive agent-to-human transfers
+- **No agent account needed for testing**: Free tier works without authentication (10 transfers/month, 2 GB each)
+- **REST API**: Simple multipart upload with JSON responses (Pro plan)
 
 ## Features
 
@@ -18,6 +26,7 @@ SendFast is a file transfer service that encrypts files in the browser using AES
 - Auto-expiring links (7 days free, up to 90 days on Pro)
 - Download tracking and analytics
 - Email delivery of download links
+- Receive links (collect files from others)
 - Custom branding (Pro plan)
 - REST API access (Pro plan)
 
@@ -25,13 +34,14 @@ SendFast is a file transfer service that encrypts files in the browser using AES
 
 - Free: 2 GB per transfer, 7-day expiry, 10 transfers/month
 - Starter ($9/mo): 25 GB per transfer, 30-day expiry, 100 transfers/month
-- Pro ($19/mo): 100 GB per transfer, 90-day expiry, 500 transfers/month
+- Pro ($19/mo): 100 GB per transfer, 90-day expiry, 500 transfers/month, API access
 
-## Actions
+## Agent Actions
 
 An AI agent can use SendFast to:
-- Upload and encrypt files via the API (Pro plan)
-- Generate shareable download links
-- Send files to recipients via email
+- Upload and encrypt files via the REST API, then share the download link with a user
+- Send files directly to a user's email with a custom message
+- Create receive links so users can securely upload files for agent processing
 - Check transfer status and download counts
-- Create receive links to collect files from others
+- Password-protect sensitive transfers
+- Set custom expiry times (1h to 90 days)

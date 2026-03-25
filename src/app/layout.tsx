@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     template: "%s | SendFast",
   },
   description:
-    "Send files instantly with end-to-end encryption. AES-256-GCM encryption in your browser. Zero-knowledge — we never see your files. No account required. Up to 2 GB free.",
+    "The agentic file transfer service. End-to-end encrypted with AES-256-GCM in your browser. Built for humans and AI agents. Zero-knowledge — we never see your files. REST API for agentic workflows.",
   keywords: [
     "file transfer",
     "encrypted file sharing",
@@ -20,8 +20,9 @@ export const metadata: Metadata = {
     "end-to-end encryption",
     "zero knowledge",
     "AES-256",
-    "password protected file sharing",
-    "encrypted upload",
+    "agentic file transfer",
+    "AI agent file sharing",
+    "API file transfer",
   ],
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://sendfast.app"),
   openGraph: {
@@ -59,7 +60,7 @@ const jsonLd = {
       name: "SendFast",
       url: "https://sendfast.app",
       description:
-        "End-to-end encrypted file transfer service. AES-256-GCM encryption in your browser. Zero-knowledge architecture.",
+        "The agentic file transfer service. End-to-end encrypted with AES-256-GCM. Built for humans and AI agents. Zero-knowledge architecture.",
       applicationCategory: "SecurityApplication",
       operatingSystem: "Any",
       offers: [
@@ -91,11 +92,13 @@ const jsonLd = {
         "AES-256-GCM end-to-end encryption",
         "Zero-knowledge architecture",
         "No account required",
+        "Agentic file transfer — AI agents send files to humans",
+        "REST API for agentic workflows",
         "Password protection",
         "Auto-expiring links",
         "Download tracking",
         "Email delivery",
-        "REST API access",
+        "Receive links — collect files from users",
         "Custom branding",
       ],
     },
