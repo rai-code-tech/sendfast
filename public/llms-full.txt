@@ -1,0 +1,132 @@
+# SendFast — Complete Reference
+
+> End-to-end encrypted file transfer. Zero-knowledge. No account required.
+
+## Overview
+
+SendFast lets users send files of any type with client-side AES-256-GCM encryption. Files are encrypted in the browser before upload. The encryption key is embedded in the URL fragment (#key=...) and never transmitted to SendFast servers, ensuring true zero-knowledge architecture.
+
+## How Encryption Works
+
+1. User selects files in the browser
+2. Browser generates a random AES-256-GCM encryption key
+3. Each file is encrypted client-side using the Web Crypto API
+4. Encrypted files are uploaded to storage
+5. A shareable URL is generated: https://sendfast.app/transfer/{id}#{encryption_key}
+6. The encryption key is in the URL fragment — it is never sent to the server
+7. Recipient opens the link, browser extracts key from the fragment
+8. Encrypted files are downloaded and decrypted client-side
+9. The server never sees unencrypted data or the encryption key
+
+## Pricing
+
+### Free Plan ($0/forever)
+- 2 GB maximum per transfer
+- 7-day link expiry
+- 10 transfers per month
+- End-to-end encryption
+- Shareable download links
+- No account required
+
+### Starter Plan ($9/month)
+- 25 GB maximum per transfer
+- 30-day link expiry
+- 100 transfers per month
+- Everything in Free, plus:
+- Password protection
+- Email delivery to recipients
+- Download tracking and analytics
+- Priority support
+
+### Pro Plan ($19/month)
+- 100 GB maximum per transfer
+- 90-day link expiry
+- 500 transfers per month
+- Everything in Starter, plus:
+- REST API access
+- Custom branding on download pages
+- Receive links (collect files from others)
+
+## REST API (Pro Plan)
+
+Base URL: https://sendfast.app/api
+
+### Upload Files
+```
+POST /api/upload
+Content-Type: multipart/form-data
+
+Parameters:
+- files: File[] (encrypted file blobs)
+- ivs: string[] (initialization vectors, base64)
+- sizes: number[] (original file sizes in bytes)
+- types: string[] (MIME types)
+- expiry: "1h" | "24h" | "7d" | "30d" | "90d"
+- password?: string (optional password protection)
+- emails?: string (comma-separated recipient emails)
+- title?: string (transfer title)
+- message?: string (message for recipients)
+
+Response: { transferId: string }
+```
+
+### Get Transfer Info
+```
+GET /api/download/{transferId}
+Query: ?password={password} (if password-protected)
+
+Response: {
+  id: string,
+  title: string | null,
+  message: string | null,
+  files: [{ id, name, size, type, iv, url }],
+  expiresAt: string | null,
+  downloadCount: number,
+  passwordProtected: boolean,
+  createdAt: string
+}
+```
+
+### List Transfers (authenticated)
+```
+GET /api/transfers
+Headers: Authorization: Bearer {session_token}
+
+Response: Transfer[]
+```
+
+### Delete Transfer (authenticated)
+```
+DELETE /api/transfers/{id}
+Headers: Authorization: Bearer {session_token}
+
+Response: { success: boolean }
+```
+
+## Agent Integration Guide
+
+To use SendFast programmatically as an AI agent:
+
+1. **Obtain a Pro account** for API access
+2. **Encrypt files client-side** using AES-256-GCM (Web Crypto API or equivalent)
+3. **Upload encrypted blobs** via POST /api/upload
+4. **Store the encryption key** — it goes in the URL fragment, not sent to the server
+5. **Share the full URL** (including #fragment) with the intended recipient
+6. **Track downloads** via GET /api/download/{id}
+
+Important: The encryption key must NEVER be sent to the server. It must only be transmitted to the recipient via the URL fragment or a secure side channel.
+
+## Tech Stack
+
+- Next.js 15 (App Router)
+- TypeScript (strict mode)
+- PostgreSQL with Prisma ORM
+- S3-compatible object storage (MinIO)
+- AES-256-GCM encryption (Web Crypto API)
+- Stripe for payments
+- Better Auth for authentication
+
+## Contact
+
+Website: https://sendfast.app
+Support: support@sendfast.app

@@ -1,0 +1,37 @@
+# SendFast
+
+> Send files. Fast. Encrypted. End-to-end encrypted file transfer with zero-knowledge security.
+
+SendFast is a file transfer service that encrypts files in the browser using AES-256-GCM before upload. The encryption key is stored in the URL fragment and never sent to our servers.
+
+## Docs
+
+- [How It Works](/llms-full.txt): Detailed technical overview, pricing, and API reference
+- [API Documentation](/api-docs.txt): REST API endpoints for programmatic file transfers
+
+## Features
+
+- End-to-end encryption (AES-256-GCM, client-side)
+- Zero-knowledge architecture (server never sees unencrypted files or keys)
+- No account required for free transfers
+- Password-protected transfers
+- Auto-expiring links (7 days free, up to 90 days on Pro)
+- Download tracking and analytics
+- Email delivery of download links
+- Custom branding (Pro plan)
+- REST API access (Pro plan)
+
+## Pricing
+
+- Free: 2 GB per transfer, 7-day expiry, 10 transfers/month
+- Starter ($9/mo): 25 GB per transfer, 30-day expiry, 100 transfers/month
+- Pro ($19/mo): 100 GB per transfer, 90-day expiry, 500 transfers/month
+
+## Actions
+
+An AI agent can use SendFast to:
+- Upload and encrypt files via the API (Pro plan)
+- Generate shareable download links
+- Send files to recipients via email
+- Check transfer status and download counts
+- Create receive links to collect files from others
