@@ -1,5 +1,8 @@
-import { createScriptHandler } from "@openpanel/nextjs/server";
+import { createRouteHandler } from "@openpanel/nextjs/server";
 
-export const GET = createScriptHandler({
+const handler = createRouteHandler({
   apiUrl: "https://analytics.raicode.tech",
 });
+
+export const GET = handler.GET;
+export const POST = handler.POST;
