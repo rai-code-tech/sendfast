@@ -1,7 +1,12 @@
 import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand, HeadBucketCommand, CreateBucketCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
+// MINIO_ENDPOINT must be a full URL including protocol, e.g. http://localhost:9002
+// or https://<account>.r2.cloudflarestorage.com for Cloudflare R2
 const endpoint = process.env.MINIO_ENDPOINT || "http://localhost:9002";
+if (!endpoint.startsWith("http")) {
+  throw new Error(`MINIO_ENDPOINT must include protocol (http/https). Got: "${endpoint}"`);
+}
 
 export const s3 = new S3Client({
   endpoint,
