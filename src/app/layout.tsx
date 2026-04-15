@@ -4,6 +4,7 @@ import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 import { Providers } from "./providers";
 import { Toaster } from "@/components/layout/toaster";
+import { OpenPanelComponent } from "@openpanel/nextjs";
 
 export const metadata: Metadata = {
   title: {
@@ -124,6 +125,14 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         <Providers>
+          <OpenPanelComponent
+            apiUrl="https://analytics.raicode.tech"
+            cdnUrl="/api/op/op1.js"
+            clientId="b111cfac-6f79-49a2-a8b9-5cba2b697aaf"
+            trackScreenViews={true}
+            trackOutgoingLinks={true}
+            trackAttributes={true}
+          />
           {children}
           <Toaster />
         </Providers>
