@@ -189,53 +189,63 @@ export function UploadZone() {
 
     try {
       const encryptionKey = await generateEncryptionKey();
-      const formData = new FormData();
 
-      const totalFiles = files.length;
-      for (let i = 0; i < totalFiles; i++) {
-        const file = files[i];
-        setProgressLabel(`Encrypting ${file.name}...`);
-        setProgress(Math.round(((i) / totalFiles) * 50));
-
-        const arrayBuffer = await file.arrayBuffer();
-        const { encrypted, iv } = await encryptFile(arrayBuffer, encryptionKey);
-
-        const encryptedBlob = new Blob([encrypted]);
-        formData.append("files", encryptedBlob, file.name);
-        formData.append("ivs", iv);
-        formData.append("sizes", file.size.toString());
-        formData.append("types", file.type || "application/octet-stream");
+      // Step 1 — encrypt all files in the browser
+      const encrypted: { blob: Blob; iv: string }[] = [];
+      for (let i = 0; i < files.length; i++) {
+        setProgressLabel(`Encrypting ${files[i].name}...`);
+        setProgress(Math.round((i / files.length) * 30));
+        const arrayBuffer = await files[i].arrayBuffer();
+        const result = await encryptFile(arrayBuffer, encryptionKey);
+        encrypted.push({ blob: new Blob([result.encrypted]), iv: result.iv });
       }
 
-      formData.append("expiry", expiry);
-      if (password) formData.append("password", password);
-      if (emails) formData.append("emails", emails);
-      if (title) formData.append("title", title);
-      if (message) formData.append("message", message);
+      setProgress(35);
+      setProgressLabel("Requesting upload URLs...");
 
-      setProgress(60);
-      setProgressLabel("Uploading encrypted files...");
-
+      // Step 2 — ask server for presigned URLs (sends metadata only, no file data)
       const response = await fetch("/api/upload", {
         method: "POST",
-        body: formData,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          files: files.map((f, i) => ({
+            name: f.name,
+            size: f.size,
+            type: f.type || "application/octet-stream",
+            iv: encrypted[i].iv,
+          })),
+          expiry,
+          ...(password && { password }),
+          ...(emails && { emails }),
+          ...(title && { title }),
+          ...(message && { message }),
+        }),
       });
-
-      setProgress(90);
-      setProgressLabel("Finalizing...");
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Upload failed");
+        const err = await response.json();
+        throw new Error(err.error || "Upload failed");
       }
 
-      const data = await response.json();
+      const { transferId, presignedUrls } = await response.json();
+
+      setProgress(40);
+      setProgressLabel("Uploading encrypted files...");
+
+      // Step 3 — upload encrypted files directly to MinIO via presigned URLs
+      for (let i = 0; i < presignedUrls.length; i++) {
+        const { url, index } = presignedUrls[i];
+        await fetch(url, {
+          method: "PUT",
+          headers: { "Content-Type": "application/octet-stream" },
+          body: encrypted[index].blob,
+        });
+        setProgress(40 + Math.round(((i + 1) / presignedUrls.length) * 55));
+      }
+
       setProgress(100);
       setProgressLabel("Done!");
-      setResult({
-        transferId: data.transferId,
-        encryptionKey,
-      });
+      setResult({ transferId, encryptionKey });
 
       toast({
         title: "Upload complete",

@@ -1,19 +1,35 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth-server";
 import { prisma } from "@/lib/prisma";
-import { uploadFile } from "@/lib/s3";
+import { getPresignedUploadUrl } from "@/lib/s3";
 import { getPlan } from "@/lib/stripe";
 import { nanoid } from "nanoid";
 import { getExpiryDate, formatBytes } from "@/lib/utils";
 import { sendTransferEmail } from "@/lib/email";
 import bcrypt from "bcryptjs";
+import { z } from "zod";
+
+const FileMetaSchema = z.object({
+  name: z.string().min(1),
+  size: z.number().positive(),
+  type: z.string(),
+  iv: z.string(),
+});
+
+const UploadRequestSchema = z.object({
+  files: z.array(FileMetaSchema).min(1),
+  expiry: z.string().default("24h"),
+  password: z.string().optional(),
+  emails: z.string().optional(),
+  title: z.string().optional(),
+  message: z.string().optional(),
+});
 
 export async function POST(req: NextRequest) {
   try {
     const session = await getSession();
     const userId = session?.user?.id;
 
-    // Look up user plan from DB if authenticated
     let userPlan = "free";
     if (userId) {
       const dbUser = await prisma.user.findUnique({
@@ -24,52 +40,38 @@ export async function POST(req: NextRequest) {
     }
     const plan = getPlan(userPlan);
 
-    const formData = await req.formData();
-    const files = formData.getAll("files") as File[];
-    const ivs = formData.getAll("ivs") as string[];
-    const originalSizes = formData.getAll("sizes") as string[];
-    const originalTypes = formData.getAll("types") as string[];
-    const title = formData.get("title") as string | null;
-    const message = formData.get("message") as string | null;
-    const password = formData.get("password") as string | null;
-    const expiry = (formData.get("expiry") as string) || "24h";
-    const recipientsRaw = formData.get("recipients") as string | null;
-    const emailsRaw = formData.get("emails") as string | null;
-
-    if (!files || files.length === 0) {
+    const body = await req.json();
+    const parsed = UploadRequestSchema.safeParse(body);
+    if (!parsed.success) {
       return NextResponse.json(
-        { error: "No files provided" },
+        { error: "Invalid request", details: parsed.error.flatten() },
         { status: 400 }
       );
     }
 
+    const { files, expiry, password, emails, title, message } = parsed.data;
+
     // Check file size limits
     let totalSize = 0;
-    for (let i = 0; i < files.length; i++) {
-      const fileSize = originalSizes[i] ? parseInt(originalSizes[i]) : files[i].size;
-      if (fileSize > plan.maxFileSize) {
+    for (const file of files) {
+      if (file.size > plan.maxFileSize) {
         return NextResponse.json(
           {
-            error: `File "${files[i].name}" exceeds the maximum size of ${formatBytes(plan.maxFileSize)} for your plan`,
+            error: `File "${file.name}" exceeds the ${formatBytes(plan.maxFileSize)} limit for your plan`,
           },
           { status: 400 }
         );
       }
-      totalSize += fileSize;
+      totalSize += file.size;
     }
 
     // Check daily transfer limit
     if (userId && plan.maxTransfersPerDay !== Infinity) {
       const todayStart = new Date();
       todayStart.setHours(0, 0, 0, 0);
-
       const transfersToday = await prisma.transfer.count({
-        where: {
-          userId,
-          createdAt: { gte: todayStart },
-        },
+        where: { userId, createdAt: { gte: todayStart } },
       });
-
       if (transfersToday >= plan.maxTransfersPerDay) {
         return NextResponse.json(
           { error: "Daily transfer limit reached for your plan" },
@@ -78,10 +80,8 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Check recipients
-    const recipientSource = recipientsRaw || emailsRaw;
-    const recipients = recipientSource
-      ? recipientSource.split(",").map((e) => e.trim()).filter(Boolean)
+    const recipients = emails
+      ? emails.split(",").map((e) => e.trim()).filter(Boolean)
       : [];
 
     if (recipients.length > 0 && !plan.emailDelivery) {
@@ -109,7 +109,7 @@ export async function POST(req: NextRequest) {
     const hashedPassword = password ? await bcrypt.hash(password, 12) : null;
     const expiresAt = getExpiryDate(expiry);
 
-    // Upload files to S3
+    // Generate presigned upload URLs — browser uploads directly to MinIO
     const fileRecords: {
       name: string;
       size: bigint;
@@ -118,27 +118,26 @@ export async function POST(req: NextRequest) {
       iv: string;
     }[] = [];
 
+    const presignedUrls: { index: number; url: string; key: string }[] = [];
+
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       const fileId = nanoid(10);
       const s3Key = `transfers/${transferId}/${fileId}/${file.name}`;
-      const buffer = Buffer.from(await file.arrayBuffer());
-      const iv = ivs[i] || "";
-      const originalType = originalTypes[i] || file.type || "application/octet-stream";
-      const originalSize = originalSizes[i] ? BigInt(originalSizes[i]) : BigInt(file.size);
 
-      await uploadFile(s3Key, buffer, "application/octet-stream");
+      const url = await getPresignedUploadUrl(s3Key);
 
+      presignedUrls.push({ index: i, url, key: s3Key });
       fileRecords.push({
         name: file.name,
-        size: originalSize,
-        type: originalType,
+        size: BigInt(file.size),
+        type: file.type || "application/octet-stream",
         s3Key,
-        iv,
+        iv: file.iv,
       });
     }
 
-    // Create transfer in DB
+    // Create transfer record immediately — files upload directly from browser
     await prisma.transfer.create({
       data: {
         id: transferId,
@@ -150,40 +149,37 @@ export async function POST(req: NextRequest) {
         recipientEmails: recipients,
         totalSize: BigInt(totalSize),
         fileCount: files.length,
-        files: {
-          create: fileRecords,
-        },
+        files: { create: fileRecords },
       },
     });
 
-    // Send emails to recipients
+    // Send emails after upload completes (best-effort)
     if (recipients.length > 0) {
-      const transferUrl = `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/transfer/${transferId}`;
+      const transferUrl = `${process.env.BETTER_AUTH_URL || "http://localhost:3000"}/transfer/${transferId}`;
       const senderName = session?.user?.name || "Someone";
 
-      const emailPromises = recipients.map((to) =>
-        sendTransferEmail({
-          to,
-          senderName,
-          transferUrl,
-          message: message || undefined,
-          fileCount: files.length,
-          totalSize: formatBytes(totalSize),
-        })
-      );
-
-      try {
-        await Promise.all(emailPromises);
-        await prisma.transfer.update({
-          where: { id: transferId },
-          data: { emailSent: true },
-        });
-      } catch (emailError) {
-        console.error("Failed to send transfer emails:", emailError);
-      }
+      Promise.all(
+        recipients.map((to) =>
+          sendTransferEmail({
+            to,
+            senderName,
+            transferUrl,
+            message: message || undefined,
+            fileCount: files.length,
+            totalSize: formatBytes(totalSize),
+          })
+        )
+      )
+        .then(() =>
+          prisma.transfer.update({
+            where: { id: transferId },
+            data: { emailSent: true },
+          })
+        )
+        .catch((err) => console.error("Failed to send transfer emails:", err));
     }
 
-    return NextResponse.json({ transferId }, { status: 201 });
+    return NextResponse.json({ transferId, presignedUrls }, { status: 201 });
   } catch (error) {
     console.error("Upload error:", error);
     return NextResponse.json(
