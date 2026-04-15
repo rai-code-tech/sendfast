@@ -33,29 +33,46 @@ let bucketReady = false;
 export async function ensureBucket() {
   if (bucketReady) return;
 
+  console.log(`[s3] ensureBucket — endpoint=${endpoint} bucket=${BUCKET}`);
+
   try {
     await s3.send(new HeadBucketCommand({ Bucket: BUCKET }));
-  } catch {
-    await s3.send(new CreateBucketCommand({ Bucket: BUCKET }));
+    console.log(`[s3] bucket exists`);
+  } catch (err: unknown) {
+    const status = (err as { $metadata?: { httpStatusCode?: number } }).$metadata?.httpStatusCode;
+    if (status === 404) {
+      console.log(`[s3] bucket not found, creating...`);
+      await s3.send(new CreateBucketCommand({ Bucket: BUCKET }));
+      console.log(`[s3] bucket created`);
+    } else {
+      console.error(`[s3] HeadBucket failed — status=${status}`, err);
+      throw err;
+    }
   }
 
-  // Allow browsers to PUT directly via presigned URLs
-  await s3.send(
-    new PutBucketCorsCommand({
-      Bucket: BUCKET,
-      CORSConfiguration: {
-        CORSRules: [
-          {
-            AllowedOrigins: ["*"],
-            AllowedMethods: ["GET", "PUT", "HEAD"],
-            AllowedHeaders: ["*"],
-            ExposeHeaders: ["ETag"],
-            MaxAgeSeconds: 3600,
-          },
-        ],
-      },
-    })
-  );
+  // Set CORS so browsers can PUT directly via presigned URLs
+  try {
+    await s3.send(
+      new PutBucketCorsCommand({
+        Bucket: BUCKET,
+        CORSConfiguration: {
+          CORSRules: [
+            {
+              AllowedOrigins: ["*"],
+              AllowedMethods: ["GET", "PUT", "HEAD"],
+              AllowedHeaders: ["*"],
+              ExposeHeaders: ["ETag"],
+              MaxAgeSeconds: 3600,
+            },
+          ],
+        },
+      })
+    );
+    console.log(`[s3] CORS configured`);
+  } catch (err: unknown) {
+    // Non-fatal — CORS may already be set or managed externally
+    console.warn(`[s3] PutBucketCors failed (non-fatal):`, err);
+  }
 
   bucketReady = true;
 }
