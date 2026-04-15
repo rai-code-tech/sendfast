@@ -235,11 +235,16 @@ export function UploadZone() {
       // Step 3 — upload encrypted files directly to MinIO via presigned URLs
       for (let i = 0; i < presignedUrls.length; i++) {
         const { url, index } = presignedUrls[i];
-        await fetch(url, {
+        const putRes = await fetch(url, {
           method: "PUT",
           headers: { "Content-Type": "application/octet-stream" },
           body: encrypted[index].blob,
         });
+        if (!putRes.ok) {
+          throw new Error(
+            `Upload failed for "${files[index].name}" (storage returned ${putRes.status})`
+          );
+        }
         setProgress(40 + Math.round(((i + 1) / presignedUrls.length) * 55));
       }
 

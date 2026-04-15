@@ -49,74 +49,151 @@ AI agents can use the SendFast REST API to securely send files (reports, exports
 - Custom branding on download pages
 - Receive links (collect files from others)
 
-## REST API (Pro Plan)
+## REST API
 
-Base URL: https://sendfast.app/api
+Base URL: https://sendfast.raicode.tech
 
-### Upload Files
+The upload flow is a 3-step presigned-URL pattern. The server never sees plaintext files or the encryption key — agents encrypt locally, then push encrypted bytes directly to object storage via short-lived signed URLs.
+
+Authentication is optional. Anonymous callers get free-tier limits (2 GB per transfer, 7-day expiry, daily quota). Authenticated callers get their plan's limits; pass a Better Auth session cookie on /api/upload.
+
+### 1. Request presigned upload URLs
+
 ```
 POST /api/upload
-Content-Type: multipart/form-data
+Content-Type: application/json
 
-Parameters:
-- files: File[] (encrypted file blobs)
-- ivs: string[] (initialization vectors, base64)
-- sizes: number[] (original file sizes in bytes)
-- types: string[] (MIME types)
-- expiry: "1h" | "24h" | "7d" | "30d" | "90d"
-- password?: string (optional password protection)
-- emails?: string (comma-separated recipient emails)
-- title?: string (transfer title)
-- message?: string (message for recipients)
-
-Response: { transferId: string }
+{
+  "files": [
+    { "name": "report.pdf", "size": 123456, "type": "application/pdf", "iv": "<base64url-iv>" }
+  ],
+  "expiry": "24h",            // "1h" | "24h" | "7d" | "30d" | "90d"
+  "password": "optional",     // optional, Pro plan
+  "emails": "a@x.com,b@y.com",// optional, comma-separated recipients
+  "title": "optional",
+  "message": "optional"
+}
 ```
 
-### Get Transfer Info
+- `size` is the ORIGINAL plaintext size in bytes.
+- `iv` is the 12-byte AES-GCM initialization vector used to encrypt that file, encoded as base64url.
+- One `iv` per file.
+
+Response (201):
+```
+{
+  "transferId": "abc1234567",
+  "presignedUrls": [
+    { "index": 0, "url": "https://.../transfers/.../report.pdf?X-Amz-...", "key": "transfers/..." }
+  ]
+}
+```
+
+### 2. PUT encrypted bytes to each presigned URL
+
+```
+PUT {presignedUrls[i].url}
+Content-Type: application/octet-stream
+Body: <encrypted file bytes> (AES-256-GCM ciphertext || 16-byte auth tag)
+```
+
+The Content-Type must be exactly `application/octet-stream` — it is part of the signature. A non-2xx response means the upload failed; the caller must treat the transfer as invalid and retry.
+
+### 3. Share the download link
+
+```
+https://sendfast.raicode.tech/transfer/{transferId}#{base64url-encryption-key}
+```
+
+The key lives in the URL fragment (`#`) and is never sent to the server. Only the recipient with the full link can decrypt.
+
+### Get transfer info (public, for download)
+
 ```
 GET /api/download/{transferId}
 Query: ?password={password} (if password-protected)
 
 Response: {
-  id: string,
-  title: string | null,
-  message: string | null,
-  files: [{ id, name, size, type, iv, url }],
-  expiresAt: string | null,
-  downloadCount: number,
-  passwordProtected: boolean,
-  createdAt: string
+  id, title, message, expiresAt, createdAt, downloadCount, passwordProtected,
+  files: [{ id, name, size, type, iv, url }]   // url = presigned download URL
 }
 ```
 
-### List Transfers (authenticated)
+### List owned transfers (authenticated)
+
 ```
 GET /api/transfers
-Headers: Authorization: Bearer {session_token}
-
+Cookie: <better-auth session>
 Response: Transfer[]
 ```
 
-### Delete Transfer (authenticated)
-```
-DELETE /api/transfers/{id}
-Headers: Authorization: Bearer {session_token}
+### Get / delete an owned transfer (authenticated)
 
-Response: { success: boolean }
+```
+GET    /api/transfers/{id}    // owner-only, returns metadata
+DELETE /api/transfers/{id}    // owner-only, deletes transfer + S3 objects
 ```
 
 ## Agent Integration Guide
 
-To use SendFast programmatically as an AI agent:
+A minimal working Node.js sender (ESM, no dependencies):
 
-1. **Obtain a Pro account** for API access
-2. **Encrypt files client-side** using AES-256-GCM (Web Crypto API or equivalent)
-3. **Upload encrypted blobs** via POST /api/upload
-4. **Store the encryption key** — it goes in the URL fragment, not sent to the server
-5. **Share the full URL** (including #fragment) with the intended recipient
-6. **Track downloads** via GET /api/download/{id}
+```js
+import { webcrypto as crypto } from "node:crypto";
+import { readFile } from "node:fs/promises";
 
-Important: The encryption key must NEVER be sent to the server. It must only be transmitted to the recipient via the URL fragment or a secure side channel.
+const BASE = "https://sendfast.raicode.tech";
+const b64url = (b) =>
+  Buffer.from(b).toString("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+
+async function sendFile(path, name, type = "application/octet-stream") {
+  const plaintext = await readFile(path);
+
+  // 1. Generate AES-256 key + 96-bit IV
+  const keyBytes = crypto.getRandomValues(new Uint8Array(32));
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const key = await crypto.subtle.importKey("raw", keyBytes, { name: "AES-GCM" }, false, ["encrypt"]);
+
+  // 2. Encrypt (Web Crypto output = ciphertext || 16-byte GCM tag)
+  const encrypted = Buffer.from(
+    await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, plaintext)
+  );
+
+  // 3. Request a presigned upload URL
+  const metaRes = await fetch(`${BASE}/api/upload`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      files: [{ name, size: plaintext.length, type, iv: b64url(iv) }],
+      expiry: "24h",
+    }),
+  });
+  if (!metaRes.ok) throw new Error(`upload metadata failed: ${metaRes.status} ${await metaRes.text()}`);
+  const { transferId, presignedUrls } = await metaRes.json();
+
+  // 4. PUT encrypted bytes directly to storage
+  const putRes = await fetch(presignedUrls[0].url, {
+    method: "PUT",
+    headers: { "Content-Type": "application/octet-stream" },
+    body: encrypted,
+  });
+  if (!putRes.ok) throw new Error(`storage PUT failed: ${putRes.status}`);
+
+  // 5. Return the share link (the # fragment stays client-side only)
+  return `${BASE}/transfer/${transferId}#${b64url(keyBytes)}`;
+}
+
+console.log(await sendFile("./report.pdf", "report.pdf", "application/pdf"));
+```
+
+### Agent rules
+
+- **Never send the encryption key to the server.** It only appears in the URL fragment (`#...`) or a secure side channel to the recipient.
+- **Always check the PUT response.** A non-2xx on step 4 means the transfer is broken — do not hand out the link.
+- **`size` is plaintext size.** Encrypted bytes are 16 bytes larger (AES-GCM tag); the server does not need to know.
+- **Use base64url (not standard base64)** for the key and IV. No padding, `-`/`_` instead of `+`/`/`.
+- **One IV per file, never reused.** Generate a fresh 12-byte IV for every encryption.
+- **Respect plan limits** (2 GB/file, 7-day expiry, daily transfer count on free tier).
 
 ## Tech Stack
 
