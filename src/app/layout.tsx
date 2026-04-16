@@ -126,7 +126,7 @@ export default function RootLayout({
         />
         <Providers>
           <OpenPanelComponent
-            apiUrl="https://analytics.raicode.tech"
+            apiUrl="/api/op"
             cdnUrl="/api/op/op1.js"
             clientId="b111cfac-6f79-49a2-a8b9-5cba2b697aaf"
             trackScreenViews={true}

@@ -1,7 +1,7 @@
 import { createRouteHandler } from "@openpanel/nextjs/server";
 
 const handler = createRouteHandler({
-  apiUrl: "https://analytics.raicode.tech",
+  apiUrl: "https://analytics-api.raicode.tech",
 });
 
 export const GET = handler.GET;
