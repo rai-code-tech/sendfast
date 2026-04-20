@@ -5,6 +5,7 @@ import "./globals.css";
 import { Providers } from "./providers";
 import { Toaster } from "@/components/layout/toaster";
 import { OpenPanelComponent } from "@openpanel/nextjs";
+import { WebMCPProvider } from "@/components/layout/web-mcp-provider";
 
 export const metadata: Metadata = {
   title: {
@@ -135,6 +136,7 @@ export default function RootLayout({
           />
           {children}
           <Toaster />
+          <WebMCPProvider />
         </Providers>
       </body>
     </html>
