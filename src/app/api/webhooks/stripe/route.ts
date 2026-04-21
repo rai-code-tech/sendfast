@@ -43,11 +43,7 @@ export async function POST(req: NextRequest) {
         const session = event.data.object as Stripe.Checkout.Session;
         const userId = session.metadata?.userId;
         const customerId = session.customer as string;
-
-        if (!userId) {
-          console.error("No userId in checkout session metadata");
-          break;
-        }
+        const customerEmail = session.customer_details?.email || session.customer_email;
 
         // Retrieve the subscription to get the price ID
         const subscriptionId = session.subscription as string;
@@ -65,15 +61,48 @@ export async function POST(req: NextRequest) {
           }
         }
 
-        await prisma.user.update({
-          where: { id: userId },
-          data: {
-            plan,
-            stripeCustomerId: customerId,
-            subscriptionId,
-            subscriptionEnd,
-          },
-        });
+        if (userId) {
+          // Standard checkout — user was logged in
+          await prisma.user.update({
+            where: { id: userId },
+            data: { plan, stripeCustomerId: customerId, subscriptionId, subscriptionEnd },
+          });
+        } else if (customerEmail) {
+          // Agentic purchase via ACS — no userId, use email to find/create the account
+          const existing = await prisma.user.findUnique({ where: { email: customerEmail } });
+
+          if (existing) {
+            // Existing user — upgrade their plan
+            await prisma.user.update({
+              where: { email: customerEmail },
+              data: { plan, stripeCustomerId: customerId, subscriptionId, subscriptionEnd },
+            });
+            console.log(`[ACS] Upgraded existing user ${customerEmail} to ${plan}`);
+          } else {
+            // New user — create account and send welcome email
+            const tempPassword = Math.random().toString(36).slice(2, 10) + Math.random().toString(36).slice(2, 10);
+            const customerName = session.customer_details?.name || customerEmail.split("@")[0];
+
+            const newUser = await prisma.user.create({
+              data: {
+                id: crypto.randomUUID(),
+                email: customerEmail,
+                name: customerName,
+                emailVerified: false,
+                plan,
+                stripeCustomerId: customerId,
+                subscriptionId,
+                subscriptionEnd,
+              },
+            });
+
+            console.log(`[ACS] Created new user ${customerEmail} (${newUser.id}) with plan ${plan}`);
+            // TODO: send welcome email with login link / password reset
+            // sendWelcomeEmail({ email: customerEmail, name: customerName, plan })
+          }
+        } else {
+          console.error("[ACS] checkout.session.completed: no userId or email — cannot provision");
+        }
 
         break;
       }

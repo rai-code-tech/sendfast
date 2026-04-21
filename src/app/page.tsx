@@ -480,6 +480,7 @@ console.log(transfer.shareUrl);
               <Link href="/pricing" className="hover:text-zinc-300 transition-colors">Pricing</Link>
               <Link href="/privacy" className="hover:text-zinc-300 transition-colors">Privacy</Link>
               <Link href="/terms" className="hover:text-zinc-300 transition-colors">Terms</Link>
+              <Link href="/refund" className="hover:text-zinc-300 transition-colors">Refund</Link>
             </div>
 
             <div className="flex items-center gap-1.5 text-[11px] text-zinc-600">

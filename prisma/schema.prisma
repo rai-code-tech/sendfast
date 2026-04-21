@@ -9,17 +9,17 @@ datasource db {
 }
 
 model user {
-  id            String    @id
+  id            String   @id
   name          String
-  email         String    @unique
-  emailVerified Boolean   @default(false)
+  email         String   @unique
+  emailVerified Boolean  @default(false)
   image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-  plan             String   @default("free")
-  stripeCustomerId String?  @unique
-  subscriptionId   String?  @unique
+  plan             String    @default("free")
+  stripeCustomerId String?   @unique
+  subscriptionId   String?   @unique
   subscriptionEnd  DateTime?
 
   sessions  session[]
@@ -59,7 +59,7 @@ model account {
 }
 
 model verification {
-  id         String   @id
+  id         String    @id
   identifier String
   value      String
   expiresAt  DateTime
@@ -68,22 +68,22 @@ model verification {
 }
 
 model Transfer {
-  id          String   @id
-  userId      String?
-  title       String?
-  message     String?
-  password    String?
-  expiresAt   DateTime?
+  id           String    @id
+  userId       String?
+  title        String?
+  message      String?
+  password     String?
+  expiresAt    DateTime?
   maxDownloads Int?
 
   recipientEmails String[] @default([])
   emailSent       Boolean  @default(false)
 
-  totalSize   BigInt   @default(0)
-  fileCount   Int      @default(0)
+  totalSize BigInt @default(0)
+  fileCount Int    @default(0)
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   user      user?      @relation(fields: [userId], references: [id], onDelete: SetNull)
   files     File[]
@@ -105,7 +105,7 @@ model File {
 }
 
 model Download {
-  id         String @id @default(cuid())
+  id         String  @id @default(cuid())
   transferId String
   ip         String?
   userAgent  String?

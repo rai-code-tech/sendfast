@@ -17,6 +17,7 @@ const nextConfig = {
       { source: "/.well-known/openid-configuration", destination: "/api/well-known/oauth-discovery" },
       { source: "/.well-known/oauth-authorization-server", destination: "/api/well-known/oauth-discovery" },
       { source: "/.well-known/oauth-protected-resource", destination: "/api/well-known/oauth-protected-resource" },
+      { source: "/.well-known/acp.json", destination: "/api/well-known/acp" },
     ];
   },
 };
